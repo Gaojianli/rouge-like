@@ -10,15 +10,18 @@ class Creature:public gameObject{
 public:
 	std::pair<int, int> postion;
 	std::string name;
-	unsigned health=100;
-	unsigned healthUpper=100;
+	int health=100;
+	int healthUpper=100;
 	unsigned power=100;
 	attitudes attitude;
 	bool beAttacked;
 	bool bePoisoned;
-	Creature(int x, int y, const char* name);
 	ObjectType getType() {
 		return ObjectType::creature;
 	}
+	virtual void died();
+	virtual bool attack(Creature& beAttack);
+protected:
+	Creature(int x, int y, const char* name, attitudes attitude);
 	//virtual void move(int x, int y);
 };
