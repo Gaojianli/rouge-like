@@ -33,8 +33,8 @@ bool Bottle::use(T& target) {
 				}
 			}
 		}catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
-			return false;
+			cout << e.what() << endl;
+			return false
 		}
 	}
 }
