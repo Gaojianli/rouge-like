@@ -1,7 +1,8 @@
 #pragma once
 enum class ObjectType {
 	creature,
-	item
+	item,
+	nothing
 };
 class gameObject {
 public:
