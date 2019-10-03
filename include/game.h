@@ -6,7 +6,7 @@ class Game {
 	list<Creature> characters;
 	Creature player;
 	Map globalMap;
-	Game();
+	Game()=default;
 	void init();//create player
 	void start();
 };

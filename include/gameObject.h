@@ -1,9 +1,10 @@
+#pragma once
 enum class ObjectType {
 	creature,
 	item
 };
 class gameObject {
-protected:
+public:
 	gameObject() = default;
 	virtual ObjectType getType();
 	virtual const char* getInfo();
