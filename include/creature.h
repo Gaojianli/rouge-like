@@ -1,11 +1,12 @@
 #include <iostream>
 #include <vector>
+#include "gameObject.h"
 #include "item.h"
 enum attitudes {
 	friendly,
 	agressive
 };
-class Creature {
+class Creature:public gameObject{
 	std::pair<int, int> postion;
 	std::string name;
 	unsigned health;
@@ -13,5 +14,10 @@ class Creature {
 	attitudes attitude;
 	bool beAttacked;
 	bool bePoisoned;
+public:
+	Creature();
+	ObjectType getType() {
+		return ObjectType::creature;
+	}
 	//virtual void move(int x, int y);
 };
