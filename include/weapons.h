@@ -8,9 +8,10 @@ enum class WeaponsType
 };
 class Weapons : public Item {
 public:
-	Weapons type;
+	WeaponsType type;
 	int attack;
 	int defense;
 	unsigned power;
-	Weapons(Weapons type, int attack, int defense, unsigned power);
+	Weapons(WeaponsType type, int attack, int defense, unsigned power);
+	ItemType getItemType();
 };

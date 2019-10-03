@@ -11,4 +11,5 @@ class Item:public gameObject {
 	std::string name;
 	ObjectType getType();
 	virtual ItemType getItemType();
+	virtual void newRoundStarts() {};
 };
