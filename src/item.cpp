@@ -1,5 +1,5 @@
 #include "item.h"
-ObjectType item::getType()
+ObjectType Item::getType()
 {
-	return ObjectType::item;
+	return ObjectType::Item;
 }
