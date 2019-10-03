@@ -1,12 +1,13 @@
 #pragma once
 enum class ObjectType {
 	creature,
-	item
+	item,
+	nothing
 };
 class gameObject {
 public:
 	gameObject() = default;
-	virtual ObjectType getType();
-	virtual const char* getInfo();
-	virtual void interactiveThis();
+	virtual ObjectType getType()=0;
+	virtual const char* getInfo()=0;
+	virtual void interactiveThis()=0;
 };

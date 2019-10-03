@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include <vector>
 #include "gameObject.h"
@@ -16,11 +17,10 @@ public:
 	attitudes attitude;
 	bool beAttacked;
 	bool bePoisoned;
-	ObjectType getType() {
-		return ObjectType::creature;
-	}
+	ObjectType getType() override;
+	const char* getInfo() override;
 	virtual void died();
-	virtual bool attack(Creature& beAttack);
+	virtual bool attack(Creature& beAttack)=0;
 protected:
 	Creature(int x, int y, const char* name, attitudes attitude);
 	//virtual void move(int x, int y);

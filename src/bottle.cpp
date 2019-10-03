@@ -1,5 +1,5 @@
 #include "bottle.h"
-Bottle::bottle(BottleType type, unsigned increased) {
+Bottle::Bottle(BottleType type, unsigned increased) {
 	this->increased = increased;
 	this->type = type;
 }

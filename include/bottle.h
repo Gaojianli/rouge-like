@@ -12,7 +12,7 @@ class Bottle :public Item {
 public:
 	unsigned increased;
 	BottleType type;
-	bottle(BottleType, unsigned increased);
+	Bottle(BottleType, unsigned increased);
 	template<typename T>
 	bool use(T& target);
 	ItemType getItemType();
