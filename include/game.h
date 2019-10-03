@@ -1,11 +1,16 @@
 #include <list>
+#include <iostream>
+#include <memory>
 #include "creature.h"
 #include "map.h"
+#include "player.h"
 using namespace std;
 class Game {
-	list<Creature> characters;
-	Creature player;
-	Map globalMap;
+private:
+	list<Creature*> characters;
+	shared_ptr<Player> player;
+	shared_ptr<Map> globalMap;
+public:
 	Game()=default;
 	void init();//create player
 	void start();
