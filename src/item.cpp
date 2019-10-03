@@ -1,7 +1,7 @@
 #include "item.h"
 ObjectType Item::getType()
 {
-	return ObjectType::Item;
+	return ObjectType::item;
 }
 
 ItemType Item::getItemType()
