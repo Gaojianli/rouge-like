@@ -21,7 +21,7 @@ public:
 	bool isOutOfRange(int x, int y);
 	ObjectType getLoactionInfo(int x, int y);
 	Creature * getLocationCreature(int x, int y);
-	item * getLocationItem(int x, int y);
+	Item * getLocationItem(int x, int y);
 	std::string getLocationInfo(int x, int y);
 	void interactiveLocation(int x, int y);
 };

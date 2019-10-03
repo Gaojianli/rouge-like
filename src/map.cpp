@@ -40,15 +40,15 @@ void Map::setDisabledGate(int disabled_gate) {
 		break;
 	}
 }
-}
 bool * Map::getGates() {
 	return enable_gate;
 }
 int Map::getPortal() {
-	return enable_portal;
+	return 0;
+	//return enable_portal;
 }
 void Map::distributeThings(std::vector<gameObject*> items) {
-	for (int i; i < items.size(); i++) {
+	for (int i=0; i < items.size(); i++) {
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
 		if (nullptr==((mapcontent[rand_x])[rand_y])) {
 			((mapcontent[rand_x])[rand_y]) = items[i];
@@ -77,6 +77,7 @@ std::vector<std::string> Map::drawablemap() {
 			}
 		}
 	}
+	return drawable;
 }
 void Map::setGameObjectat(int x, int y, gameObject * gameobj) {
 	(mapcontent[x])[y] = gameobj;
@@ -103,8 +104,8 @@ ObjectType Map::getLoactionInfo(int x, int y) {
 Creature * Map::getLocationCreature(int x, int y) {
 	return dynamic_cast<Creature*>(((mapcontent[x])[y]));
 }
-item * Map::getLocationItem(int x, int y) {
-	return dynamic_cast<item*>(((mapcontent[x])[y]));
+Item * Map::getLocationItem(int x, int y) {
+	return dynamic_cast<Item*>(((mapcontent[x])[y]));
 }
 std::string Map::getLocationInfo(int x, int y) {
 	return std::string(((mapcontent[x])[y])->getInfo());

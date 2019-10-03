@@ -1,4 +1,5 @@
 #include <list>
+#include <memory>
 #include <iostream>
 #include "creature.h"
 #include "map.h"
