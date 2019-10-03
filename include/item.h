@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 #include "gameObject.h"
 enum class ItemType {

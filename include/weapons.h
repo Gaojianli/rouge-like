@@ -1,5 +1,6 @@
+#pragma once
 #include "item.h"
-enum class Weapons
+enum class WeaponsType
 {
 	cane,
 	sword,

@@ -1,4 +1,5 @@
 #include <exception>
+#pragma once
 #include "item.h"
 #include "creature.h"
 #include "monster.h"
