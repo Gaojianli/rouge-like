@@ -7,6 +7,8 @@ using namespace std;
 
 int main()
 {
-	cout << "Hello CMake。" << endl;
+	auto game = Game();
+	game.init();
+	game.start();
 	return 0;
 }
