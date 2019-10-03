@@ -1,4 +1,5 @@
 #include "mankind.h"
+#include "weapons.h"
 Mankind::Mankind(std::pair<int x,int y> postion,const char* name, Role role):Creature(postion.first,postion.second,name)
 {
 	switch (role)
@@ -43,4 +44,32 @@ bool Mankind::conjure(Monster* object)
 		this->mana -= object->power;
 		object->bePoisoned = 5;//control 5 rounds
 	}
+}
+
+bool Mankind::attack(Creature& beAttack)
+{
+	beAttack.beAttacked = true;
+	//calculate attack sum
+	int attackSum = power;
+	for (auto &i : backpack) {
+		if (i.getItemType() == ItemType::weapons) {
+			attackSum += static_cast<Weapons&>(i).attack;
+		}
+	}
+	//calculate defends sum
+	int defenseSum = beAttack.power;
+	if (auto beAttackMankind = dynamic_cast<Mankind&>(beAttack); beAttackMankind != nullptr) {//attack monster
+		for (auto i& : beAttackMankind.backpack) {
+			if (i.getItemType() == ItemType::weapons) {
+				defenseSum += static_cast<Weapons&>(i).defense;
+			}
+		}
+	}
+	if (attackSum < defenseSum)
+		return false;//nothing happend;
+	else
+		beAttack.health -= attackSum - defenseSum;
+	if (beAttack.health < 0)
+		beAttack.died();
+	return true;
 }
