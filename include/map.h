@@ -13,6 +13,8 @@ public:
 	Map() = default;
 	void setPortal(int enable_portal); 
 	void setDisabledGate(int disabled_gate);
+	bool * getGates();
+	int getPortal();
 	void distributeThings(std::vector<gameObject*> items);
 	std::vector<std::string> drawablemap();
 	void setGameObjectat(int x, int y,gameObject * gameobj);

@@ -41,9 +41,15 @@ void Map::setDisabledGate(int disabled_gate) {
 	}
 }
 }
+bool * Map::getGates() {
+	return enable_gate;
+}
+int Map::getPortal() {
+	return enable_portal;
+}
 void Map::distributeThings(std::vector<gameObject*> items) {
 	for (int i; i < items.size(); i++) {
-		int rand_x = (std::rand() % 8), rand_y = (std::rand() % 8);
+		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
 		if (nullptr==((mapcontent[rand_x])[rand_y])) {
 			((mapcontent[rand_x])[rand_y]) = items[i];
 		}
