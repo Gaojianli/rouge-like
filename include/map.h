@@ -11,7 +11,7 @@ private:
 	bool enable_gate[4] = { true,true,true,true }; // Flags of gate, 0: Gate up, 1: Gate down, 2: Gate left, 3: Gate right
 	int portal_stat = 0; // 0 for disable,1 for top left, 2 for top right, etc
 public:
-	Map() = default;
+	Map();
 	void setPortal(int enable_portal); // Enable certain portal, see argument usage above
 	void setDisabledGate(int disabled_gate); // Disables certain gate, see args above
 	bool * getGates(); // Get gates status

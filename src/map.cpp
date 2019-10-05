@@ -2,6 +2,17 @@
 #include <vector>
 #include <string>
 #include "gameObject.h"
+Map::Map() {
+	for (int i = 0; i < 9; i++)
+	{
+		std::vector<gameObject *> thisrow;
+		for (int j = 0; j < 9; j++)
+		{
+			thisrow.push_back(nullptr);
+		}
+		mapcontent.push_back(thisrow);
+	}
+}
 void Map::setPortal(int enable_portal) { // Use switch to avoid illegal value
 	switch (enable_portal)
 	{
@@ -92,7 +103,7 @@ void Map::setGameObjectat(int x, int y, gameObject* gameobj) {
 
 bool Map::isOutOfRange(int x, int y)
 {
-	if (x < 0 || x > 9 || y < 0 || y > 9) {
+	if (x < 0 || x > 8 || y < 0 || y > 8) {
 		return true;
 	}
 	else
