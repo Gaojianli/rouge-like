@@ -1,7 +1,7 @@
 #include "mankind.h"
 #include "weapons.h"
 #include <string>
-Mankind::Mankind(std::pair<int,int> postion,const char* name, Role role, attitudes attitude):Creature(postion.first,postion.second,name, attitude),role(role)
+Mankind::Mankind(std::pair<int, int> postion, const char* name, Role role, attitudes attitude) :Creature(postion.first, postion.second, name, attitude), role(role)
 {
 	switch (role)
 	{
@@ -55,7 +55,7 @@ bool Mankind::attack(Creature& beAttack)
 	beAttack.beAttacked = true;
 	//calculate attack sum
 	int attackSum = power;
-	for (auto &i : backpack) {
+	for (auto& i : backpack) {
 		if (i.getItemType() == ItemType::weapons) {
 			attackSum += static_cast<Weapons&>(i).attack;
 		}
@@ -84,11 +84,20 @@ bool Mankind::attack(Creature& beAttack)
 
 const char* Mankind::getInfo()
 {
+	const std::string roles[] = {
+		"magician",
+		"wizard",
+		"warrior",
+		"harpy",
+		"amazon",
+		"dwarf",
+		"monkey"
+	};
 	/*
 	example:A magician. Which power is 5. Very dangerous.
 	*/
-	std::string introduction="A ";
-	introduction +=typeid(role).name();
+	std::string introduction = "A ";
+	introduction += roles[(int)role];
 	introduction += ". Which power is " + std::to_string(this->power);
 	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
 	return introduction.c_str();

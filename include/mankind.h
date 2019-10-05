@@ -2,7 +2,7 @@
 #include "creature.h"
 #include "monster.h"
 enum class Role {
-	magician,
+	magician=0,
 	wizard,
 	warrior,
 	harpy,

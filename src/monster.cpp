@@ -9,7 +9,7 @@ bool Monster::attack(Creature& beAttack)
 	int defenseSum = beAttack.power;
 	try {
 		auto beAttackMankind = dynamic_cast<Mankind&>(beAttack);//attack monster
-		for (auto &i : beAttackMankind.backpack) {
+		for (auto& i : beAttackMankind.backpack) {
 			if (i.getItemType() == ItemType::weapons) {
 				defenseSum += static_cast<Weapons&>(i).defense;
 			}
@@ -29,16 +29,22 @@ bool Monster::attack(Creature& beAttack)
 
 const char* Monster::getInfo()
 {
-
+	const std::string monsterTypes[] = {
+		"slime",
+		"skeleton",
+		"dragon",
+		"snake",
+		"tarrasque"
+	};
 	std::string introduction = "A ";
-	introduction += typeid(type).name();
+	introduction += monsterTypes[(int)type];
 	introduction += ". Which power is " + std::to_string(this->power);
 	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
 	return introduction.c_str();
 }
 
 Monster::Monster(std::pair<int, int> postion, const char* name, MonsterType type, attitudes attitude)
-	:Creature(postion.first,postion.second,name,attitude),type(type),beControlled(0)
+	:Creature(postion.first, postion.second, name, attitude), type(type), beControlled(0)
 {
 
 }
