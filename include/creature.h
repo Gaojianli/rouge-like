@@ -20,6 +20,7 @@ public:
 	ObjectType getType() override;
 	virtual void died();
 	virtual bool attack(Creature& beAttack);
+	void setPosition(unsigned x, unsigned y);
 	virtual int getAttack() = 0;//return the sum of the attack points of this creature
 	virtual int getDefense() = 0;//return the sum of the defense points of this creature
 protected:
