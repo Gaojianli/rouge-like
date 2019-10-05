@@ -18,6 +18,8 @@ public:
 	int getPortal(); // Get portal_stat
 	void distributeThings(const std::vector<gameObject*> & items); // Automatically distribute objects on the map
 	void eraseGameObjectat(int x, int y); // Erase object on certain location of the map
+	Item* pickUpObject(int x, int y); // Return a ptr of an object and remove it from the map
+	bool moveObject(int src_x, int src_y, int dst_x, int dst_y); // Move object form (src_x,src_y) to (dst_x,dst_y), if (dst_x,dst_y) have item, return false and do nothing
 	std::vector<std::string> drawablemap(); // Generate map for ui
 	void setGameObjectat(int x, int y,gameObject * gameobj); // Set a game oject at certain location
 	bool isOutOfRange(int x, int y); // Judge if a location is out of map
