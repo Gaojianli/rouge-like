@@ -20,6 +20,7 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
+	std::pair<int, int> zeropair = std::make_pair(0, 0);
 	int bottlenum = (std::rand() % 8 + 16);
 	std::vector<gameObject *> item_to_distribute;
 	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
@@ -36,6 +37,28 @@ void Game::init()
 		{
 		case 0:
 		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 1:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 2:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 3:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 4:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			break;
 		}
 		default:
 			break;
@@ -151,13 +174,6 @@ void Game::start()
 	Backpack
 	Help
 	Exit
-	����(��ѡ)
-	����(��ѡ)
-	ʩ��(��ѡ)
-	��ʰ(��ѡ)
-	����
-	����
-	�˳�
 */
 WINDOW **Game::drawMenu()
 {
@@ -304,25 +320,33 @@ void Game::drawMap()
 }
 void Game::nextRound()
 {
-	for (auto& charac : characters)
+	for (auto &charac : characters)
 	{
+		for (int i = 4; i > 0; i--)
+		{
+			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
+				i++; //move failed, try again;
+		}
+		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
+		{ //attack randomly
+		}
 		if (charac->bePoisoned > 0)
 		{
 			charac->health -= charac->bePoisoned * 2; //health loss of ponison
 			charac->bePoisoned--;
 		}
-		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
+		if (auto monsterChar = dynamic_cast<Monster *>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
 			monsterChar->beControlled--;
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
-	for (auto& obj : sameRoomCharacters)
+	for (auto &obj : sameRoomCharacters)
 	{
 		if (obj->getType() == ObjectType::creature)
 		{
-			if (auto creatureObj = dynamic_cast<Creature*>(obj); creatureObj->name != player->name)
+			if (auto creatureObj = dynamic_cast<Creature *>(obj); creatureObj->name != player->name)
 			{
 				//temp function to calculate distance
 				auto calDistance = [](std::pair<int, int> postionA, std::pair<int, int> postionB) {
@@ -343,7 +367,7 @@ void Game::nextRound()
 					}
 				}
 				//NPC pick item
-				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr)
+				if (auto mankindObj = dynamic_cast<Mankind *>(creatureObj); mankindObj != nullptr)
 				{
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
