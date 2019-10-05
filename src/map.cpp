@@ -72,11 +72,11 @@ std::vector<std::string> Map::drawablemap() {
 			}
 			else if (ObjectType::creature == j->getType())
 			{
-				thisLine += 'O';
+				thisLine += '()';
 			}
 			else if (ObjectType::item == j->getType())
 			{
-				thisLine += '*';
+				thisLine += '**';
 			}
 		}
 	}
