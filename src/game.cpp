@@ -1,4 +1,5 @@
 #include "game.h"
+#include "bottle.h"
 #include "curses/curses.h"
 using std::string;
 void Game::init()
@@ -13,6 +14,7 @@ void Game::init()
 	curs_set(0);
 	raw();
 	noecho();
+	globalMap = std::make_shared<Map>(Map());
 }
 
 void Game::start()
@@ -112,6 +114,8 @@ void Game::drawMain() {
 	wborder(info, '|', '|', '-', '-', '+', '+', '+', '+');
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
+	drawMap();
+	getch();
 }
 
 void Game::addInfo(const char* message)
@@ -130,4 +134,36 @@ void Game::addInfo(const char* message)
 		waddstr(info, infoList[(i + header) % 17].c_str());
 	}
 	wrefresh(info);
+}
+
+void Game::drawMap()
+{
+	auto item = std::vector<gameObject*>{
+	new Bottle(BottleType::bloodBottle,10),
+	new Bottle(BottleType::bloodBottle,10),
+	new Bottle(BottleType::bloodBottle,10),
+	};
+	globalMap->distributeThings(item);
+	auto mapStr = globalMap->drawablemap();
+	auto gates = globalMap->getGates();
+	for (int i = 0; i < 9; i++) {
+		wmove(map, i + 1, 1);
+		waddstr(map, (mapStr[i]).c_str());
+	}
+	if (gates[0]) {
+		wmove(map, 0, 9);
+		waddstr(map, "nn");
+	}
+	if (gates[1]) {
+		wmove(map, 10, 9);
+		waddstr(map, "nn");
+	}
+	if (gates[2]) {
+		wmove(map, 6, 0);
+		waddstr(map, "n");
+	}
+	if (gates[3]) {
+		wmove(map, 6, 19);
+		waddstr(map, "n");
+	}
 }

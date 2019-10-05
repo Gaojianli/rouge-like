@@ -20,4 +20,5 @@ public:
 	void start();
 	void drawMain();
 	void addInfo(const char* message);
+	void drawMap();
 };
