@@ -19,7 +19,9 @@ public:
 	bool bePoisoned;
 	ObjectType getType() override;
 	virtual void died();
-	virtual bool attack(Creature& beAttack)=0;
+	virtual bool attack(Creature& beAttack);
+	virtual int getAttack() = 0;//return the sum of the attack points of this creature
+	virtual int getDefense() = 0;//return the sum of the defense points of this creature
 protected:
 	Creature(int x, int y, const char* name, attitudes attitude);
 	//virtual void move(int x, int y);

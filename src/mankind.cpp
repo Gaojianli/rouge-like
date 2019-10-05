@@ -50,38 +50,6 @@ bool Mankind::conjure(Monster* object)
 		return false;
 }
 
-bool Mankind::attack(Creature& beAttack)
-{
-	beAttack.beAttacked = true;
-	//calculate attack sum
-	int attackSum = power;
-	for (auto& i : backpack) {
-		if (i.getItemType() == ItemType::weapons) {
-			attackSum += static_cast<Weapons&>(i).attack;
-		}
-	}
-	//calculate defends sum
-	int defenseSum = beAttack.power;
-	try {
-		auto beAttackMankind = dynamic_cast<Mankind&>(beAttack);//attack monster
-		for (auto& i : beAttackMankind.backpack) {
-			if (i.getItemType() == ItemType::weapons) {
-				defenseSum += static_cast<Weapons&>(i).defense;
-			}
-		}
-	}
-	catch (std::bad_cast&) {
-		defenseSum = beAttack.power;
-	}
-	if (attackSum < defenseSum)
-		return false;//nothing happened
-	else
-		beAttack.health -= attackSum - defenseSum;
-	if (beAttack.health < 0)
-		beAttack.died();
-	return true;
-}
-
 const char* Mankind::getInfo()
 {
 	const std::string roles[] = {
@@ -101,4 +69,26 @@ const char* Mankind::getInfo()
 	introduction += ". Which power is " + std::to_string(this->power);
 	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
 	return introduction.c_str();
+}
+
+int Mankind::getAttack()
+{
+	int attackSum = power;
+	for (auto& i : backpack) {
+		if (i.getItemType() == ItemType::weapons) {
+			attackSum += static_cast<Weapons&>(i).attack;
+		}
+	}
+	return attackSum;
+}
+
+int Mankind::getDefense()
+{
+	int defenseSum = power;
+	for (auto& i : backpack) {
+		if (i.getItemType() == ItemType::weapons) {
+			defenseSum += static_cast<Weapons&>(i).defense;
+		}
+	}
+	return defenseSum;
 }

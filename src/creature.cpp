@@ -12,3 +12,18 @@ ObjectType Creature::getType()
 void Creature::died() {
 	std::cout << "I am died";
 }
+
+bool Creature::attack(Creature& beAttack) {
+	beAttack.beAttacked = true;
+	//calculate attack sum
+	int attackSum = this->getAttack();
+	//calculate defends sum
+	int defenseSum = beAttack.getDefense();
+	if (attackSum < defenseSum)
+		return false;//nothing happened
+	else
+		beAttack.health -= attackSum - defenseSum;
+	if (beAttack.health < 0)
+		beAttack.died();
+	return true;
+}

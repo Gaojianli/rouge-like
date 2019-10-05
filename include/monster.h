@@ -13,6 +13,7 @@ public:
 	int beControlled = 0;;//0 is not be controlled, other is the lasting time
 	void interactiveThis() override {};
 	MonsterType type;
-	bool attack(Creature& beAttack);
+	int getAttack() override;
+	int getDefense() override;
 	const char* getInfo() override;
 };
