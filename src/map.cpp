@@ -47,7 +47,7 @@ int Map::getPortal() {
 	return 0;
 	//return enable_portal;
 }
-void Map::distributeThings(std::vector<gameObject*> items) {
+void Map::distributeThings(const std::vector<gameObject*> & items) {
 	for (int i=0; i < items.size(); i++) {
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
 		if (nullptr==((mapcontent[rand_x])[rand_y])) {
@@ -57,6 +57,9 @@ void Map::distributeThings(std::vector<gameObject*> items) {
 			i--;
 		}
 	}
+}
+void Map::eraseGameObjectat(int x, int y) {
+	(mapcontent[x])[y] = nullptr;
 }
 std::vector<std::string> Map::drawablemap() {
 	std::vector<std::string> drawable;

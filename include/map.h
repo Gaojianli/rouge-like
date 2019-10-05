@@ -15,7 +15,8 @@ public:
 	void setDisabledGate(int disabled_gate);
 	bool * getGates();
 	int getPortal();
-	void distributeThings(std::vector<gameObject*> items);
+	void distributeThings(const std::vector<gameObject*> & items);
+	void eraseGameObjectat(int x, int y);
 	std::vector<std::string> drawablemap();
 	void setGameObjectat(int x, int y,gameObject * gameobj);
 	bool isOutOfRange(int x, int y);
