@@ -131,3 +131,8 @@ void Game::addInfo(const char* message)
 	}
 	wrefresh(info);
 }
+
+void Game::nextRound()
+{
+
+}
