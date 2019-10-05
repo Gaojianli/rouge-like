@@ -168,3 +168,7 @@ void Game::drawMap()
 	}
 	wrefresh(map);
 }
+void Game::nextRound()
+{
+
+}
