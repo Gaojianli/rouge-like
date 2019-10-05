@@ -93,11 +93,11 @@ void Map::setGameObjectat(int x, int y, gameObject* gameobj) {
 bool Map::isOutOfRange(int x, int y)
 {
 	if (x < 0 || x > 9 || y < 0 || y > 9) {
-		return false;
+		return true;
 	}
 	else
 	{
-		return true;
+		return false;
 	}
 }
 ObjectType Map::getLoactionInfo(int x, int y) {
