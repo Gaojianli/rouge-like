@@ -4,7 +4,7 @@
 #include "gameObject.h"
 #include "item.h"
 enum attitudes {
-	friendly,
+	friendly=0,
 	agressive
 };
 enum class MoveDirection {

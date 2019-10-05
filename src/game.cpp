@@ -19,6 +19,7 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
+	std::pair<int, int> zeropair = std::make_pair(0, 0);
 	int bottlenum = (std::rand() % 8 + 16);
 	std::vector<gameObject*> item_to_distribute;
 	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
@@ -34,7 +35,24 @@ void Game::init()
 		switch (std::rand()%5)
 		{
 		case 0: {
-
+			item_to_distribute.push_back(new Monster(zeropair, ("Slime"+std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 1: {
+			item_to_distribute.push_back(new Monster(zeropair, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 2: {
+			item_to_distribute.push_back(new Monster(zeropair, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 3: {
+			item_to_distribute.push_back(new Monster(zeropair, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 4: {
+			item_to_distribute.push_back(new Monster(zeropair, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			break;
 		}
 		default:
 			break;
