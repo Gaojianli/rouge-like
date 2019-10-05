@@ -83,7 +83,7 @@ std::vector<std::string> Map::drawablemap() {
 		std::string thisLine;
 		for (auto& j : i) {
 			if (j == nullptr) {
-				thisLine += ' ';
+				thisLine += '  ';
 			}
 			else if (ObjectType::creature == j->getType())
 			{
@@ -94,6 +94,7 @@ std::vector<std::string> Map::drawablemap() {
 				thisLine += '**';
 			}
 		}
+		drawable.push_back(thisLine);
 	}
 	return drawable;
 }
