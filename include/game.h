@@ -4,6 +4,7 @@
 #include "creature.h"
 #include "curses/curses.h"
 #include "map.h"
+#include "mainmap.h"
 #include "player.h"
 
 class Game {
@@ -13,6 +14,7 @@ private:
 	WINDOW* menubar, *map, *info, *status;
 	std::string infoList[17];
 	int header = 0;
+	MainMap mainmap;
 public:
 	std::shared_ptr<Map> globalMap;
 	Game()=default;

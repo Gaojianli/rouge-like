@@ -1,6 +1,32 @@
 #include "bottle.h"
+<<<<<<< HEAD
 #include "game.h"
 extern std::shared_ptr<Game> game;
+=======
+Bottle::Bottle() {
+	int type = (std::rand() % 3);
+	switch (type)
+	{
+	case 0: {
+		this->type = BottleType::bloodBottle;
+		this->increased = (std::rand() % 20 + 20);
+		break;
+	}
+	case 1: {
+		this->type = BottleType::manaBottle;
+		this->increased = std::rand() % 30 + 50;
+		break;
+	}
+	case 2: {
+		this->type = BottleType::poison;
+		this->increased = std::rand() % 3 + 3;
+		break;
+	}
+	default:
+		break;
+	}
+}
+>>>>>>> df9e42076d81c7fa4a34c8ca7aa2b804c61eba85
 Bottle::Bottle(BottleType type, unsigned increased) {
 	this->increased = increased;
 	this->type = type;
