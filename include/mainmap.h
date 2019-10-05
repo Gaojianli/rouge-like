@@ -1,5 +1,5 @@
 //MainMap.h
-/*
+
 #pragma once
 #define MAP_SIZE 4
 #include <iostream>
@@ -12,17 +12,12 @@
 class MainMap {
 private:
 	std::vector<std::vector<Map>> maps;
-	int mainmap_x;
-	int mainmap_y;
+	int mainmap_x = 0;
+	int mainmap_y = 0;
 public:
-	MainMap() {
-		for (int i = 0; i < MAP_SIZE; i++)
-		{
-			std::vector<Map> thisLine;
-			for (int j = 0; j < MAP_SIZE; j++)
-			{
-				Map
-			}
-		}
-	}
-};*/
+	MainMap();
+	bool SetMapLocation(int x, int y); // Set X and Y if Not out of range and return true, otherwise return false and do nothing
+	bool isOutOfRange(int x,int y);
+	int GetMapXLocation();
+	int GetMapYLocation();
+};
