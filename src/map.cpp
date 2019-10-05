@@ -83,15 +83,15 @@ std::vector<std::string> Map::drawablemap() {
 		std::string thisLine;
 		for (auto& j : i) {
 			if (j == nullptr) {
-				thisLine += '  ';
+				thisLine += "  ";
 			}
 			else if (ObjectType::creature == j->getType())
 			{
-				thisLine += '()';
+				thisLine += "()";
 			}
 			else if (ObjectType::item == j->getType())
 			{
-				thisLine += '* ';
+				thisLine += "* ";
 			}
 		}
 		drawable.push_back(thisLine);
