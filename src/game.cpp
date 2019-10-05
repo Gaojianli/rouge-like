@@ -112,7 +112,6 @@ void Game::drawMain() {
 	wborder(info, '|', '|', '-', '-', '+', '+', '+', '+');
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
-	getch();
 }
 
 void Game::addInfo(const char* message)
@@ -122,10 +121,13 @@ void Game::addInfo(const char* message)
 	{
 		messageStr += " ";
 	}
-	for (int i = 0; i <= messageStr.length() / 96; i ++) {
+	for (int i = 0; i < messageStr.length() / 96; i ++) {
 		infoList[header++] = messageStr.substr(i * 96, 96);
 		header %= 17;
 	}
 	for (int i = 0; i < 17; i++) {
+		wmove(info, i + 1, 1);
+		waddstr(info, infoList[(i + header) % 17].c_str());
 	}
+	wrefresh(info);
 }
