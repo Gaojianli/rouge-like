@@ -6,8 +6,8 @@ void Game::init()
 {
 	initscr();
 	start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLUE);
-	init_pair(2, COLOR_BLUE, COLOR_WHITE);
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);
+	init_pair(2, COLOR_BLACK, COLOR_WHITE);
 	init_pair(3, COLOR_WHITE, COLOR_RED);
 	init_pair(4, COLOR_WHITE, COLOR_GREEN);
 	init_pair(5, COLOR_WHITE, COLOR_YELLOW);
@@ -96,8 +96,100 @@ void Game::start()
 	clrtobot();
 	refresh();
 	drawMain();
+	drawMap();
+	WINDOW** menu = nullptr;
+	MenuType menuChoose = MenuType::Attack;
+	while (true) {
+		ch = getch();
+		switch (ch)
+		{
+		case 'M':
+		case 'm':
+			menu = drawMenu();
+			menuChoose = scrollMenu(menu, 7);
+			deleteMenu(menu,8);
+		default:
+			break;
+		}
+	}
 }
+/*
+	Investigation
+	Attack
+	Control
+	Pick up
+	Backpack
+	Help
+	Exit
+	调查(可选)
+	攻击(可选)
+	施法(可选)
+	捡拾(可选)
+	背包
+	帮助
+	退出
+*/
+WINDOW** Game::drawMenu() {
+	const char* muneStr[]{
+		"Investigation",
+		"Attack",
+		"Control",
+		"Pick up",
+		"Backpack",
+		"Help",
+		"Exit"
+	};
+	int i;
+	WINDOW** items;
+	items = (WINDOW * *)malloc(8 * sizeof(WINDOW*));
 
+	items[0] = newwin(9, 15, 3, 83);
+	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
+	items[1] = subwin(items[0], 1, 13, 4, 84);
+	items[2] = subwin(items[0], 1, 13, 5, 84);
+	items[3] = subwin(items[0], 1, 13, 6, 84);
+	items[4] = subwin(items[0], 1, 13, 7, 84);
+	items[5] = subwin(items[0], 1, 13, 8, 84);
+	items[6] = subwin(items[0], 1, 13, 9, 84);
+	items[7] = subwin(items[0], 1, 13, 10, 84);
+	for (i = 0; i < 7; i++)
+		wprintw(items[i+1], muneStr[i]);
+	wbkgd(items[1], COLOR_PAIR(2));
+	wrefresh(items[0]);
+	return items;
+}
+MenuType Game::scrollMenu(WINDOW** items, int count)
+{
+	int key;
+	int selected = 0;
+	while (1) {
+		key = getch();
+		if (key == KEY_DOWN || key == KEY_UP) {
+			wbkgd(items[selected + 1], COLOR_PAIR(1));
+			wnoutrefresh(items[selected + 1]);
+			if (key == KEY_DOWN) {
+				selected = (selected + 1) % count;
+			}
+			else {
+				selected = (selected + count - 1) % count;
+			}
+			wbkgd(items[selected + 1], COLOR_PAIR(2));
+			wnoutrefresh(items[selected + 1]);
+			doupdate();
+		}
+		else if (key == 13) {
+			return MenuType(selected);
+		}
+	}
+}
+void Game::deleteMenu(WINDOW** items, int count) {
+	int i;
+	for (i = 0; i < count; i++)
+		delwin(items[i]);
+	free(items);
+	touchwin(stdscr);
+	refresh();
+}
 void Game::drawMain() {
 	resize_term(34,100);
 	clrtobot();
@@ -114,8 +206,6 @@ void Game::drawMain() {
 	wborder(info, '|', '|', '-', '-', '+', '+', '+', '+');
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
-	drawMap();
-	getch();
 }
 
 void Game::addInfo(const char* message)
