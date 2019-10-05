@@ -10,9 +10,9 @@ class Game {
 private:
 	list<Creature*> characters;
 	shared_ptr<Player> player;
-	shared_ptr<Map> globalMap;
 	WINDOW* menubar, *map, *info, *status;
 public:
+	shared_ptr<Map> globalMap;
 	Game()=default;
 	void init();//create player
 	void start();
