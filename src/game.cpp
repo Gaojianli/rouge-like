@@ -24,7 +24,6 @@ void Game::start()
 	move(LINES / 2 - 2, 0);
 	clrtoeol();
 	noecho();
-	player = make_shared<Player>(Player({ 0,0 }, name, Role::wizard));
 	mvprintw(4, COLS / 2 - 27, "Please select a role:");
 	const string roles[] = {
 		"magician",
@@ -81,7 +80,10 @@ void Game::start()
 			break;
 		}
 	}
-	refresh();
+	player = make_shared<Player>(Player({ 0,0 }, name, static_cast<Role>(postion)));
 	delete[] name;
+	move(2, 0);
+	clrtobot();
+	refresh();
 
 }
