@@ -52,6 +52,10 @@ void Map::distributeThings(const std::vector<gameObject*>& items) {
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
 		if (nullptr == ((mapcontent[rand_x])[rand_y])) {
 			((mapcontent[rand_x])[rand_y]) = items[i];
+			if(ObjectType::creature==items[i]->getType){
+				Creature* cret = static_cast<Creature*>(items[i]);
+				cret->setPosition(rand_x, rand_y);
+			}
 		}
 		else {
 			i--;
