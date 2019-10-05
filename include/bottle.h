@@ -15,5 +15,7 @@ public:
 	Bottle(BottleType, unsigned increased);
 	template<typename T>
 	bool use(T& target);
-	ItemType getItemType();
+	ItemType getItemType() override;
+	const char* getInfo() override;
+	// void interactiveThis() override;
 };

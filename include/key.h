@@ -2,13 +2,14 @@
 #include "item.h"
 enum class Directions
 {
-	east,
-	south,
-	west,
-	north
+	up=0,
+	down,
+	right,
+	left,
+	win
 };
 class Key : public Item {
-	bool used;
+	bool used = false;
 public:
 	Directions direction;
 	unsigned step;
@@ -16,4 +17,5 @@ public:
 	bool useIt();
 	void newRoundStarts();
 	ItemType getItemType();
+	const char* getInfo() override;
 };
