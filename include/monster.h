@@ -1,9 +1,18 @@
 #pragma once
 #include "mankind.h"
+enum class MonsterType {
+	slime,
+	skeleton,
+	dragon,
+	snake,
+	tarrasque
+};
 class Monster :public Creature {
 public:
-	Monster();
-	int beControlled;//0 is not be controlled, other is the lasting time
+	Monster(std::pair<int, int> postion, const char* name, MonsterType type, attitudes attitude);
+	int beControlled = 0;;//0 is not be controlled, other is the lasting time
 	void interactiveThis() override {};
+	MonsterType type;
 	bool attack(Creature& beAttack);
+	const char* getInfo() override;
 };

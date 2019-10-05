@@ -1,5 +1,6 @@
 #include "monster.h"
 #include "weapons.h"
+#include <string>
 bool Monster::attack(Creature& beAttack)
 {
 	beAttack.beAttacked = true;
@@ -24,4 +25,20 @@ bool Monster::attack(Creature& beAttack)
 	if (beAttack.health < 0)
 		beAttack.died();
 	return true;
+}
+
+const char* Monster::getInfo()
+{
+
+	std::string introduction = "A ";
+	introduction += typeid(type).name();
+	introduction += ". Which power is " + std::to_string(this->power);
+	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
+	return introduction.c_str();
+}
+
+Monster::Monster(std::pair<int, int> postion, const char* name, MonsterType type, attitudes attitude)
+	:Creature(postion.first,postion.second,name,attitude),type(type),beControlled(0)
+{
+
 }

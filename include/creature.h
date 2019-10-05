@@ -18,7 +18,6 @@ public:
 	bool beAttacked;
 	bool bePoisoned;
 	ObjectType getType() override;
-	const char* getInfo() override;
 	virtual void died();
 	virtual bool attack(Creature& beAttack)=0;
 protected:

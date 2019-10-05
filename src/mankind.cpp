@@ -1,6 +1,7 @@
 #include "mankind.h"
 #include "weapons.h"
-Mankind::Mankind(std::pair<int,int> postion,const char* name, Role role):Creature(postion.first,postion.second,name,attitudes::friendly)
+#include <string>
+Mankind::Mankind(std::pair<int,int> postion,const char* name, Role role, attitudes attitude):Creature(postion.first,postion.second,name, attitude),role(role)
 {
 	switch (role)
 	{
@@ -73,10 +74,22 @@ bool Mankind::attack(Creature& beAttack)
 		defenseSum = beAttack.power;
 	}
 	if (attackSum < defenseSum)
-		return false;//nothing happend;
+		return false;//nothing happened
 	else
 		beAttack.health -= attackSum - defenseSum;
 	if (beAttack.health < 0)
 		beAttack.died();
 	return true;
+}
+
+const char* Mankind::getInfo()
+{
+	/*
+	example:A magician. Which power is 5. Very dangerous.
+	*/
+	std::string introduction="A ";
+	introduction +=typeid(role).name();
+	introduction += ". Which power is " + std::to_string(this->power);
+	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
+	return introduction.c_str();
 }

@@ -4,9 +4,6 @@ Creature::Creature(int x, int y, const char* name,attitudes attitude) :postion({
 
 }
 
-const char* Creature::getInfo() {
-	return NULL;
-}
 ObjectType Creature::getType()
 {
 	return ObjectType::creature;
