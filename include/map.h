@@ -23,7 +23,7 @@ public:
 	std::vector<std::string> drawablemap(); // Generate map for ui
 	void setGameObjectat(int x, int y,gameObject * gameobj); // Set a game oject at certain location
 	bool isOutOfRange(int x, int y); // Judge if a location is out of map
-	ObjectType getLoactionInfo(int x, int y); // Get objecttype of certain location
+	ObjectType getLocationType(int x, int y); // Get objecttype of certain location
 	Creature * getLocationCreature(int x, int y); // If it's a creature , return it otherwise return a nullptr(dynamic cast)
 	Item * getLocationItem(int x, int y); // same to above
 	std::string getLocationInfo(int x, int y); // Return a string of object info, If nothing there, give out a "Nothing special there"

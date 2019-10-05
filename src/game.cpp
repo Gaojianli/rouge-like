@@ -1,6 +1,9 @@
 #include "game.h"
 #include "bottle.h"
+#include "monster.h"
+#include "mankind.h"
 #include "mainmap.h"
+#include "key.h"
 #include "curses/curses.h"
 using std::string;
 void Game::init()
@@ -17,8 +20,26 @@ void Game::init()
 	noecho();
 	// Generate items
 	int bottlenum = (std::rand() % 8 + 16);
-	int keynum = 4;
+	std::vector<gameObject*> item_to_distribute;
+	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
+	{
+		item_to_distribute.push_back(new Bottle());
+	}
+	for (int j = 0; j < 5; j++) // Add keys to item list
+	{
+		item_to_distribute.push_back(new Key(static_cast<Directions>(j), 1));
+	}
+	for (int k = 0; k < 3; k++) // Add Monster to item list
+	{
+		switch (std::rand()%5)
+		{
+		case 0: {
 
+		}
+		default:
+			break;
+		}
+	}
 	globalMap = std::make_shared<Map>(Map());
 }
 
