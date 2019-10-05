@@ -7,6 +7,17 @@
 #include "mainmap.h"
 #include "player.h"
 
+enum class MenuType
+{
+	Investigation = 0,
+	Attack,
+	PickUp,
+	Control,
+	Backpack,
+	Help,
+	Exit
+};
+
 class Game {
 private:
 	std::list<Creature*> characters;
@@ -21,6 +32,9 @@ public:
 	void init();//create player
 	void start();
 	void drawMain();
+	WINDOW** drawMenu();
+	MenuType scrollMenu(WINDOW** items, int count);
+	void deleteMenu(WINDOW** items, int count);
 	void nextRound();
 	void addInfo(const char* message);
 	void drawMap();

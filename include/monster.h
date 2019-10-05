@@ -1,7 +1,7 @@
 #pragma once
 #include "mankind.h"
 enum class MonsterType {
-	slime,
+	slime=0,
 	skeleton,
 	dragon,
 	snake,
