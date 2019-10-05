@@ -18,6 +18,7 @@ void Game::init()
 	// Generate items
 	int bottlenum = (std::rand() % 8 + 16);
 	int keynum = 4;
+
 	globalMap = std::make_shared<Map>(Map());
 }
 

@@ -1,8 +1,6 @@
 #include "bottle.h"
-<<<<<<< HEAD
 #include "game.h"
 extern std::shared_ptr<Game> game;
-=======
 Bottle::Bottle() {
 	int type = (std::rand() % 3);
 	switch (type)
@@ -26,7 +24,6 @@ Bottle::Bottle() {
 		break;
 	}
 }
->>>>>>> df9e42076d81c7fa4a34c8ca7aa2b804c61eba85
 Bottle::Bottle(BottleType type, unsigned increased) {
 	this->increased = increased;
 	this->type = type;
