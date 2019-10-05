@@ -3,6 +3,13 @@
 void Game::init()
 {
 	initscr();
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLUE);
+	init_pair(2, COLOR_BLUE, COLOR_WHITE);
+	init_pair(3, COLOR_WHITE, COLOR_RED);
+	init_pair(4, COLOR_WHITE, COLOR_GREEN);
+	init_pair(5, COLOR_WHITE, COLOR_YELLOW);
+	curs_set(0);
 	raw();
 	noecho();
 }
@@ -85,5 +92,21 @@ void Game::start()
 	move(2, 0);
 	clrtobot();
 	refresh();
+	drewMain();
+}
 
+void Game::drewMain() {
+	resize_term(34,100);
+	clrtobot();
+	bkgd(COLOR_PAIR(1));
+	menubar = subwin(stdscr, 1, 100, 0, 0);
+	wbkgd(menubar, COLOR_PAIR(4));
+	map = subwin(stdscr, 11, 20, 2, 1);
+	wbkgd(map, COLOR_PAIR(3));
+	status = subwin(stdscr, 11, 77, 2, 22);
+	wbkgd(status, COLOR_PAIR(5));
+	info = subwin(stdscr, 19, 98, 14, 1);
+	wbkgd(info, COLOR_PAIR(5));
+	refresh();
+	getch();
 }

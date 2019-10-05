@@ -20,4 +20,7 @@ public:
 	bool isOutOfRange(int x,int y);
 	int GetMapXLocation();
 	int GetMapYLocation();
+	Map& GetMapAt(int x, int y) {
+		return ((maps[x])[y]);
+	}
 };
