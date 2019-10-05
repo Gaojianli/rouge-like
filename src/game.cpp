@@ -139,16 +139,16 @@ void Game::addInfo(const char* message)
 void Game::drawMap()
 {
 	auto item = std::vector<gameObject*>{
-	new Bottle(BottleType::bloodBottle,10),
-	new Bottle(BottleType::bloodBottle,10),
-	new Bottle(BottleType::bloodBottle,10),
+		new Bottle(BottleType::bloodBottle,10),
+		new Bottle(BottleType::bloodBottle,10),
+		new Bottle(BottleType::bloodBottle,10),
 	};
 	globalMap->distributeThings(item);
 	auto mapStr = globalMap->drawablemap();
 	auto gates = globalMap->getGates();
 	for (int i = 0; i < 9; i++) {
 		wmove(map, i + 1, 1);
-		waddstr(map, (mapStr[i]).c_str());
+		waddstr(map, mapStr[i].c_str());
 	}
 	if (gates[0]) {
 		wmove(map, 0, 9);
@@ -159,11 +159,12 @@ void Game::drawMap()
 		waddstr(map, "nn");
 	}
 	if (gates[2]) {
-		wmove(map, 6, 0);
+		wmove(map, 5, 0);
 		waddstr(map, "n");
 	}
 	if (gates[3]) {
-		wmove(map, 6, 19);
+		wmove(map, 5, 19);
 		waddstr(map, "n");
 	}
+	wrefresh(map);
 }

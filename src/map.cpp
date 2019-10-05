@@ -91,7 +91,7 @@ std::vector<std::string> Map::drawablemap() {
 			}
 			else if (ObjectType::item == j->getType())
 			{
-				thisLine += "* ";
+				thisLine += "<>";
 			}
 		}
 		drawable.push_back(thisLine);
