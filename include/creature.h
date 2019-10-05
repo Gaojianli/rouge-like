@@ -9,7 +9,7 @@ enum attitudes {
 };
 class Creature:public gameObject{
 public:
-	std::pair<int, int> postion;
+	std::pair<int, int> position;
 	std::string name;
 	int health=100;
 	int healthUpper=100;

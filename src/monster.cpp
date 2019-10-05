@@ -17,8 +17,8 @@ const char* Monster::getInfo()
 	return introduction.c_str();
 }
 
-Monster::Monster(std::pair<int, int> postion, const char* name, MonsterType type, attitudes attitude)
-	:Creature(postion.first, postion.second, name, attitude), type(type), beControlled(0)
+Monster::Monster(std::pair<int, int> position, const char* name, MonsterType type, attitudes attitude)
+	:Creature(position.first, position.second, name, attitude), type(type), beControlled(0)
 {
 
 }

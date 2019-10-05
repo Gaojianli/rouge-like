@@ -9,7 +9,7 @@ enum class MonsterType {
 };
 class Monster :public Creature {
 public:
-	Monster(std::pair<int, int> postion, const char* name, MonsterType type, attitudes attitude);
+	Monster(std::pair<int, int> position, const char* name, MonsterType type, attitudes attitude);
 	int beControlled = 0;;//0 is not be controlled, other is the lasting time
 	void interactiveThis() override {};
 	MonsterType type;

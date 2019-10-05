@@ -1,7 +1,7 @@
 #include "mankind.h"
 #include "weapons.h"
 #include <string>
-Mankind::Mankind(std::pair<int, int> postion, const char* name, Role role, attitudes attitude) :Creature(postion.first, postion.second, name, attitude), role(role)
+Mankind::Mankind(std::pair<int, int> position, const char* name, Role role, attitudes attitude) :Creature(position.first, position.second, name, attitude), role(role)
 {
 	switch (role)
 	{

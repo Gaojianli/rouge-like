@@ -18,7 +18,7 @@ public:
 	std::vector<Item> backpack;
 	Role role;
 	std::vector<Monster*> follower;
-	Mankind(std::pair<int, int> postion,const char* name, Role role, attitudes attitude);
+	Mankind(std::pair<int, int> position,const char* name, Role role, attitudes attitude);
 	bool conjure(Monster* object);
 	const char* getInfo() override;
 	void interactiveThis() override {};
