@@ -1,5 +1,6 @@
 #include "game.h"
 #include "curses/curses.h"
+using std::string;
 void Game::init()
 {
 	initscr();
@@ -87,26 +88,44 @@ void Game::start()
 			break;
 		}
 	}
-	player = make_shared<Player>(Player({ 0,0 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ 0,0 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
 	refresh();
-	drewMain();
+	drawMain();
 }
 
-void Game::drewMain() {
+void Game::drawMain() {
 	resize_term(34,100);
 	clrtobot();
-	bkgd(COLOR_PAIR(1));
+	//bkgd(COLOR_PAIR(1));
 	menubar = subwin(stdscr, 1, 100, 0, 0);
-	wbkgd(menubar, COLOR_PAIR(4));
+	//wbkgd(menubar, COLOR_PAIR(4));
 	map = subwin(stdscr, 11, 20, 2, 1);
-	wbkgd(map, COLOR_PAIR(3));
+	//wbkgd(map, COLOR_PAIR(3));
 	status = subwin(stdscr, 11, 77, 2, 22);
-	wbkgd(status, COLOR_PAIR(5));
+	//wbkgd(status, COLOR_PAIR(5));
 	info = subwin(stdscr, 19, 98, 14, 1);
-	wbkgd(info, COLOR_PAIR(5));
+	wborder(map, '|', '|', '-', '-', '+', '+', '+', '+');
+	wborder(status, '|', '|', '-', '-', '+', '+', '+', '+');
+	wborder(info, '|', '|', '-', '-', '+', '+', '+', '+');
+	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
 	getch();
+}
+
+void Game::addInfo(const char* message)
+{
+	auto messageStr = string(message);
+	while (messageStr.length() % 96 != 0)
+	{
+		messageStr += " ";
+	}
+	for (int i = 0; i <= messageStr.length() / 96; i ++) {
+		infoList[header++] = messageStr.substr(i * 96, 96);
+		header %= 17;
+	}
+	for (int i = 0; i < 17; i++) {
+	}
 }

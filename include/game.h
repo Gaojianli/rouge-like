@@ -5,16 +5,19 @@
 #include "curses/curses.h"
 #include "map.h"
 #include "player.h"
-using namespace std;
+
 class Game {
 private:
-	list<Creature*> characters;
-	shared_ptr<Player> player;
+	std::list<Creature*> characters;
+	std::shared_ptr<Player> player;
 	WINDOW* menubar, *map, *info, *status;
+	std::string infoList[17];
+	int header = 0;
 public:
-	shared_ptr<Map> globalMap;
+	std::shared_ptr<Map> globalMap;
 	Game()=default;
 	void init();//create player
 	void start();
-	void drewMain();
+	void drawMain();
+	void addInfo(const char* message);
 };
