@@ -17,6 +17,7 @@ public:
 	void setDisabledGate(int disabled_gate); // Disables certain gate, see args above
 	bool * getGates(); // Get gates status
 	int getPortal(); // Get portal_stat
+	std::vector<gameObject*>& getObjectList(); //return objectlist
 	void distributeThings(const std::vector<gameObject*> & items); // Automatically distribute objects on the map
 	void eraseGameObjectat(int x, int y); // Erase object on certain location of the map
 	std::vector<std::string> drawablemap(); // Generate map for ui

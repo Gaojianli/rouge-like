@@ -59,6 +59,9 @@ int Map::getPortal() {
 	return 0;
 	//return enable_portal;
 }
+std::vector<gameObject*> & Map::getObjectList() {
+	return objectlist;
+}
 void Map::distributeThings(const std::vector<gameObject*>& items) {
 	for (int i = 0; i < items.size(); i++) {
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
