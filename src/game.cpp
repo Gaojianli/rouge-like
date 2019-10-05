@@ -1,5 +1,6 @@
 #include "game.h"
 #include "bottle.h"
+#include "mainmap.h"
 #include "curses/curses.h"
 using std::string;
 void Game::init()
@@ -14,6 +15,9 @@ void Game::init()
 	curs_set(0);
 	raw();
 	noecho();
+	// Generate items
+	int bottlenum = (std::rand() % 8 + 16);
+	int keynum = 4;
 	globalMap = std::make_shared<Map>(Map());
 }
 
