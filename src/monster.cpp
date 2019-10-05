@@ -1,15 +1,14 @@
 #include "monster.h"
 #include "weapons.h"
 #include <string>
-const char* Monster::getInfo()
+const char *Monster::getInfo()
 {
 	const std::string monsterTypes[] = {
 		"slime",
 		"skeleton",
 		"dragon",
 		"snake",
-		"tarrasque"
-	};
+		"tarrasque"};
 	std::string introduction = "A ";
 	introduction += monsterTypes[(int)type];
 	introduction += ". Which power is " + std::to_string(this->power);
@@ -17,10 +16,9 @@ const char* Monster::getInfo()
 	return introduction.c_str();
 }
 
-Monster::Monster(std::pair<int, int> position, const char* name, MonsterType type, attitudes attitude)
-	:Creature(position.first, position.second, name, attitude), type(type), beControlled(0)
+Monster::Monster(std::pair<int, int> position, const char *name, MonsterType type, attitudes attitude)
+	: Creature(position.first, position.second, name, attitude), type(type), beControlled(0)
 {
-
 }
 
 int Monster::getAttack()

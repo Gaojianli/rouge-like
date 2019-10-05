@@ -18,24 +18,26 @@ enum class MenuType
 	Exit
 };
 
-class Game {
+class Game
+{
 private:
-	std::list<Creature*> characters;
+	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
-	WINDOW* menubar, *map, *info, *status;
+	WINDOW *menubar, *map, *info, *status;
 	std::string infoList[17];
 	int header = 0;
 	MainMap mainmap;
+
 public:
 	std::shared_ptr<Map> globalMap;
-	Game()=default;
-	void init();//create player
+	Game() = default;
+	void init(); //create player
 	void start();
 	void drawMain();
-	WINDOW** drawMenu();
-	MenuType scrollMenu(WINDOW** items, int count);
-	void deleteMenu(WINDOW** items, int count);
+	WINDOW **drawMenu();
+	MenuType scrollMenu(WINDOW **items, int count);
+	void deleteMenu(WINDOW **items, int count);
 	void nextRound();
-	void addInfo(const char* message);
+	void addInfo(const char *message);
 	void drawMap();
 };

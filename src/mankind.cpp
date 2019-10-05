@@ -1,7 +1,9 @@
 #include "mankind.h"
 #include "weapons.h"
 #include <string>
-Mankind::Mankind(std::pair<int, int> position, const char* name, Role role, attitudes attitude) :Creature(position.first, position.second, name, attitude), role(role)
+#include "game.h"
+extern std::shared_ptr<Game> game;
+Mankind::Mankind(std::pair<int, int> position, const char *name, Role role, attitudes attitude) : Creature(position.first, position.second, name, attitude), role(role)
 {
 	switch (role)
 	{
@@ -39,18 +41,19 @@ Mankind::Mankind(std::pair<int, int> position, const char* name, Role role, atti
 }
 
 //control a monster, return true if succeed
-bool Mankind::conjure(Monster* object)
+bool Mankind::conjure(Monster *object)
 {
-	if (this->mana > object->power) {//enough mana
+	if (this->mana > object->power)
+	{ //enough mana
 		this->mana -= object->power;
-		object->beControlled = 5;//control 5 rounds
+		object->beControlled = 5; //control 5 rounds
 		return true;
 	}
 	else
 		return false;
 }
 
-const char* Mankind::getInfo()
+const char *Mankind::getInfo()
 {
 	const std::string roles[] = {
 		"magician",
@@ -59,8 +62,7 @@ const char* Mankind::getInfo()
 		"harpy",
 		"amazon",
 		"dwarf",
-		"monkey"
-	};
+		"monkey"};
 	/*
 	example:A magician. Which power is 5. Very dangerous.
 	*/
@@ -74,9 +76,11 @@ const char* Mankind::getInfo()
 int Mankind::getAttack()
 {
 	int attackSum = power;
-	for (auto& i : backpack) {
-		if (i.getItemType() == ItemType::weapons) {
-			attackSum += static_cast<Weapons&>(i).attack;
+	for (auto &i : backpack)
+	{
+		if (i.getItemType() == ItemType::weapons)
+		{
+			attackSum += static_cast<Weapons &>(i).attack;
 		}
 	}
 	return attackSum;
@@ -85,15 +89,17 @@ int Mankind::getAttack()
 int Mankind::getDefense()
 {
 	int defenseSum = power;
-	for (auto& i : backpack) {
-		if (i.getItemType() == ItemType::weapons) {
-			defenseSum += static_cast<Weapons&>(i).defense;
+	for (auto &i : backpack)
+	{
+		if (i.getItemType() == ItemType::weapons)
+		{
+			defenseSum += static_cast<Weapons &>(i).defense;
 		}
 	}
 	return defenseSum;
 }
 
-bool Mankind::attack(Creature& beAttack)
+bool Mankind::attack(Creature &beAttack)
 {
 	beAttack.beAttacked = true;
 	//calculate attack sum
@@ -101,13 +107,25 @@ bool Mankind::attack(Creature& beAttack)
 	//calculate defends sum
 	int defenseSum = beAttack.getDefense();
 	if (attackSum < defenseSum)
-		return false;//nothing happened
+		return false; //nothing happened
 	else
 		beAttack.health -= attackSum - defenseSum;
 	if (beAttack.health < 0)
 		beAttack.died();
-	for (auto& i : follower) {//monster be controlled will attack same object
+	for (auto &i : follower)
+	{ //monster be controlled will attack same object
 		i->attack(beAttack);
 	}
 	return true;
+}
+
+bool Mankind::pick(Item &toPick)
+{
+	if (backpack.size() <= 4) //backpack is full
+	{
+		this->backpack.push_back(toPick);
+		return true;
+	}
+	else
+		return false;
 }

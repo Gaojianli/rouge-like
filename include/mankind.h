@@ -16,6 +16,7 @@ public:
 	unsigned mana=0;
 	unsigned manaUpper=0;
 	std::vector<Item> backpack;
+	bool pick(Item& toPick);
 	Role role;
 	std::vector<Monster*> follower;
 	Mankind(std::pair<int, int> position,const char* name, Role role, attitudes attitude);

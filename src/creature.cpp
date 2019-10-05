@@ -1,9 +1,8 @@
 #include "creature.h"
 #include "game.h"
 extern std::shared_ptr<Game> game;
-Creature::Creature(int x, int y, const char* name,attitudes attitude) :position({ x,y }), name(name), beAttacked(false), bePoisoned(false),attitude(attitude)
+Creature::Creature(int x, int y, const char *name, attitudes attitude) : position({x, y}), name(name), beAttacked(false), bePoisoned(false), attitude(attitude)
 {
-
 }
 
 ObjectType Creature::getType()
@@ -11,18 +10,20 @@ ObjectType Creature::getType()
 	return ObjectType::creature;
 }
 
-void Creature::died() {
-	game->globalMap->eraseGameObjectat(position.first, position.second);
+void Creature::died()
+{
+	game->globalMap->eraseGameObjectAt(position.first, position.second);
 }
 
-bool Creature::attack(Creature& beAttack) {
+bool Creature::attack(Creature &beAttack)
+{
 	beAttack.beAttacked = true;
 	//calculate attack sum
 	int attackSum = this->getAttack();
 	//calculate defends sum
 	int defenseSum = beAttack.getDefense();
 	if (attackSum < defenseSum)
-		return false;//nothing happened
+		return false; //nothing happened
 	else
 		beAttack.health -= attackSum - defenseSum;
 	if (beAttack.health < 0)
@@ -33,7 +34,7 @@ bool Creature::attack(Creature& beAttack) {
 void Creature::setPosition(unsigned x, unsigned y)
 {
 	if (x < 9 && y < 9)
-		this->position = { x,y };
+		this->position = {x, y};
 }
 
 bool Creature::move(MoveDirection direction)
@@ -56,11 +57,13 @@ bool Creature::move(MoveDirection direction)
 		newX++;
 		break;
 	}
-	if (game->globalMap->isOutOfRange(newX, newY)) {
-		return false;//out of range
+	if (game->globalMap->isOutOfRange(newX, newY))
+	{
+		return false; //out of range
 	}
-	else {
-		position = { newX,newY };
+	else
+	{
+		position = {newX, newY};
 		return true;
 	}
 }

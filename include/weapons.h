@@ -2,11 +2,12 @@
 #include "item.h"
 enum class WeaponsType
 {
-	cane=0,
+	cane = 0,
 	sword,
 	shield
 };
-class Weapons : public Item {
+class Weapons : public Item
+{
 public:
 	WeaponsType type;
 	int attack;
@@ -14,5 +15,5 @@ public:
 	unsigned mana;
 	Weapons(WeaponsType type, int attack, int defense, unsigned power);
 	ItemType getItemType();
-	const char* getInfo() override;
+	const char *getInfo() override;
 };

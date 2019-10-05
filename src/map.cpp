@@ -3,7 +3,8 @@
 #include <string>
 #include "gameObject.h"
 
-Map::Map() {
+Map::Map()
+{
 	for (int i = 0; i < 9; i++)
 	{
 		std::vector<gameObject *> thisrow;
@@ -14,83 +15,106 @@ Map::Map() {
 		mapcontent.push_back(thisrow);
 	}
 }
-void Map::setPortal(int enable_portal) { // Use switch to avoid illegal value
+void Map::setPortal(int enable_portal)
+{ // Use switch to avoid illegal value
 	switch (enable_portal)
 	{
-	case 1: {
+	case 1:
+	{
 		portal_stat = 1;
 	}
-	case 2: {
+	case 2:
+	{
 		portal_stat = 2;
 	}
-	case 3: {
+	case 3:
+	{
 		portal_stat = 3;
 	}
-	case 4: {
+	case 4:
+	{
 		portal_stat = 4;
 	}
 	default:
 		break;
 	}
 }
-void Map::setDisabledGate(int disabled_gate) {
+void Map::setDisabledGate(int disabled_gate)
+{
 	switch (disabled_gate)
 	{
-	case 0: {
+	case 0:
+	{
 		enable_gate[0] = false;
 	}
-	case 1: {
+	case 1:
+	{
 		enable_gate[1] = false;
 	}
-	case 2: {
+	case 2:
+	{
 		enable_gate[2] = false;
 	}
-	case 3: {
+	case 3:
+	{
 		enable_gate[3] = false;
 	}
 	default:
 		break;
 	}
 }
-bool* Map::getGates() {
+bool *Map::getGates()
+{
 	return enable_gate;
 }
-int Map::getPortal() {
+int Map::getPortal()
+{
 	return 0;
 	//return enable_portal;
 }
-std::vector<gameObject*> & Map::getSameRoomObjectList() {
+std::vector<gameObject *> &Map::getSameRoomObjectList()
+{
 	return objectlist;
 }
-void Map::distributeThings(const std::vector<gameObject*>& items) {
-	for (int i = 0; i < items.size(); i++) {
+void Map::distributeThings(const std::vector<gameObject *> &items)
+{
+	for (int i = 0; i < items.size(); i++)
+	{
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
-		if (nullptr == ((mapcontent[rand_x])[rand_y])) {
+		if (nullptr == ((mapcontent[rand_x])[rand_y]))
+		{
 			((mapcontent[rand_x])[rand_y]) = items[i];
 			objectlist.push_back(items[i]);
-			if(ObjectType::creature==items[i]->getType()){
-				Creature* cret = static_cast<Creature*>(items[i]);
+			if (ObjectType::creature == items[i]->getType())
+			{
+				Creature *cret = static_cast<Creature *>(items[i]);
 				cret->setPosition(rand_x, rand_y);
 			}
 		}
-		else {
+		else
+		{
 			i--;
 		}
 	}
 }
-void Map::eraseGameObjectat(int x, int y) {
-	if (nullptr == (mapcontent[x])[y]) {
+void Map::eraseGameObjectAt(int x, int y)
+{
+	if (nullptr == (mapcontent[x])[y])
+	{
 		objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[x])[y]));
 	}
 	(mapcontent[x])[y] = nullptr;
 }
-std::vector<std::string> Map::drawablemap() {
+std::vector<std::string> Map::drawablemap()
+{
 	std::vector<std::string> drawable;
-	for (auto& i : mapcontent)
+	for (auto &i : mapcontent)
 	{
 		std::string thisLine;
-		for (auto& j : i) {
-			if (j == nullptr) {
+		for (auto &j : i)
+		{
+			if (j == nullptr)
+			{
 				thisLine += "  ";
 			}
 			else if (ObjectType::creature == j->getType())
@@ -106,14 +130,16 @@ std::vector<std::string> Map::drawablemap() {
 	}
 	return drawable;
 }
-void Map::setGameObjectat(int x, int y, gameObject* gameobj) {
+void Map::setGameObjectat(int x, int y, gameObject *gameobj)
+{
 	objectlist.push_back(gameobj);
 	(mapcontent[x])[y] = gameobj;
 }
 
 bool Map::isOutOfRange(int x, int y)
 {
-	if (x < 0 || x > 8 || y < 0 || y > 8) {
+	if (x < 0 || x > 8 || y < 0 || y > 8)
+	{
 		return true;
 	}
 	else
@@ -121,29 +147,40 @@ bool Map::isOutOfRange(int x, int y)
 		return false;
 	}
 }
-ObjectType Map::getLocationType(int x, int y) {
-	if (nullptr == (mapcontent[x])[y]) {
+ObjectType Map::getLocationType(int x, int y)
+{
+	if (nullptr == (mapcontent[x])[y])
+	{
 		return ObjectType::nothing;
 	}
-	else {
+	else
+	{
 		return (mapcontent[x])[y]->getType();
 	}
 }
-Creature* Map::getLocationCreature(int x, int y) {
-	return dynamic_cast<Creature*>(((mapcontent[x])[y]));
+Creature *Map::getLocationCreature(int x, int y)
+{
+	return dynamic_cast<Creature *>(((mapcontent[x])[y]));
 }
-Item* Map::getLocationItem(int x, int y) {
-	return dynamic_cast<Item*>(((mapcontent[x])[y]));
+Item *Map::getLocationItem(int x, int y)
+{
+	return dynamic_cast<Item *>(((mapcontent[x])[y]));
 }
-std::string Map::getLocationInfo(int x, int y) {
-	if (nullptr == (mapcontent[x])[y]){
+std::string Map::getLocationInfo(int x, int y)
+{
+	if (nullptr == (mapcontent[x])[y])
+	{
 		return "Nothing special there";
-}
+	}
 	return std::string(((mapcontent[x])[y])->getInfo());
 }
-void Map::interactiveLocation(int x, int y){
-	if (nullptr == (mapcontent[x])[y]) {}
-	else {
+void Map::interactiveLocation(int x, int y)
+{
+	if (nullptr == (mapcontent[x])[y])
+	{
+	}
+	else
+	{
 		((mapcontent[x])[y])->interactiveThis();
 	}
 }
