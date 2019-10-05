@@ -7,8 +7,8 @@ using namespace std;
 
 int main()
 {
-	auto game = Game();
-	game.init();
-	game.start();
+	game = make_shared<Game>(Game());
+	game->init();
+	game->start();
 	return 0;
 }

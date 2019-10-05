@@ -1,4 +1,6 @@
 #include "creature.h"
+#include "game.h"
+extern std::shared_ptr<Game> game;
 Creature::Creature(int x, int y, const char* name,attitudes attitude) :position({ x,y }), name(name), beAttacked(false), bePoisoned(false),attitude(attitude)
 {
 
@@ -10,7 +12,7 @@ ObjectType Creature::getType()
 }
 
 void Creature::died() {
-	std::cout << "I am died";
+	game->globalMap->eraseGameObjectat(position.first, position.second);
 }
 
 bool Creature::attack(Creature& beAttack) {
@@ -26,4 +28,10 @@ bool Creature::attack(Creature& beAttack) {
 	if (beAttack.health < 0)
 		beAttack.died();
 	return true;
+}
+
+void Creature::setPosition(unsigned x, unsigned y)
+{
+	if (x < 9 && y < 9)
+		this->position = { x,y };
 }
