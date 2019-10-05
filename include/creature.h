@@ -3,7 +3,7 @@
 #include <vector>
 #include "gameObject.h"
 #include "item.h"
-enum attitudes {
+enum class attitudes {
 	friendly,
 	agressive
 };

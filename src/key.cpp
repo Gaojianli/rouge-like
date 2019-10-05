@@ -38,6 +38,7 @@ const char* Key::getInfo() {
 	describe += ordinal[this->step];
 	describe += " room ";
 	describe += directionsStr[static_cast<int>(this->direction)] + '.';
+	return describe.c_str();
 }
 bool Key::useIt() {
 	if (this->used == false) {

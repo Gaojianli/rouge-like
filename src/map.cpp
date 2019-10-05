@@ -59,7 +59,7 @@ int Map::getPortal() {
 	return 0;
 	//return enable_portal;
 }
-std::vector<gameObject*> & Map::getObjectList() {
+std::vector<gameObject*> & Map::getSameRoomObjectList() {
 	return objectlist;
 }
 void Map::distributeThings(const std::vector<gameObject*>& items) {

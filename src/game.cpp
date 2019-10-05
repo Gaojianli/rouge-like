@@ -2,6 +2,7 @@
 #include "bottle.h"
 #include "mainmap.h"
 #include "curses/curses.h"
+#include <cmath>
 using std::string;
 void Game::init()
 {
@@ -104,7 +105,7 @@ void Game::start()
 }
 
 void Game::drawMain() {
-	resize_term(34,100);
+	resize_term(34, 100);
 	clrtobot();
 	//bkgd(COLOR_PAIR(1));
 	menubar = subwin(stdscr, 1, 100, 0, 0);
@@ -130,7 +131,7 @@ void Game::addInfo(const char* message)
 	{
 		messageStr += " ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i ++) {
+	for (int i = 0; i < messageStr.length() / 96; i++) {
 		infoList[header++] = messageStr.substr(i * 96, 96);
 		header %= 17;
 	}
@@ -176,13 +177,6 @@ void Game::drawMap()
 void Game::nextRound()
 {
 	for (auto& charac : characters) {
-		for (int i = 4; i > 0; i--) {
-			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
-				i++;//move failed, try again;
-		}
-		if (charac->attitude == attitudes::agressive||charac->beAttacked==true) {//attack randomly
-			
-		}
 		if (charac->bePoisoned > 0) {
 			charac->health -= charac->bePoisoned * 2;//health loss of ponison
 			charac->bePoisoned--;
@@ -192,4 +186,26 @@ void Game::nextRound()
 			monsterChar->beControlled--;
 		}
 	}
-}
+	auto sameRoomCharacters = globalMap->getSameRoomObjectList();//all objects in same room
+	for (auto& obj : sameRoomCharacters) {
+		if (obj->getType() == ObjectType::creature) {
+			if (auto creatureObj = dynamic_cast<Creature*>(obj); creatureObj->name != player->name) {
+				//temp function to calculate distance
+				auto calDistance = [](std::pair<int, int>postionA, std::pair<int, int>postionB) {
+					auto sumX = powf(postionA.first - postionB.first, 2);
+					auto sumY = powf(postionA.second - postionB.second, 2);
+					return sqrt(sumX + sumY);
+				};
+				for (int i = 4; i > 0; i--) {
+					if (creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
+						i++;//move failed, try again;
+				}
+				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true) {//attack randomly
+					if (calDistance(creatureObj->position, player->position) == 1) {//can attack player
+						creatureObj->attack(*player);
+					}
+				}
+				if(globalMap->getLoactionInfo)
+			}
+		}
+	}
