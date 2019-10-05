@@ -7,6 +7,12 @@ enum attitudes {
 	friendly,
 	agressive
 };
+enum class MoveDirection {
+	up=0,
+	down,
+	left,
+	right
+};
 class Creature:public gameObject{
 public:
 	std::pair<int, int> position;
@@ -16,14 +22,14 @@ public:
 	unsigned power=100;
 	attitudes attitude;
 	bool beAttacked;
-	bool bePoisoned;
+	int bePoisoned;
 	ObjectType getType() override;
 	virtual void died();
 	virtual bool attack(Creature& beAttack);
 	void setPosition(unsigned x, unsigned y);
 	virtual int getAttack() = 0;//return the sum of the attack points of this creature
 	virtual int getDefense() = 0;//return the sum of the defense points of this creature
+	virtual bool move(MoveDirection direction);
 protected:
 	Creature(int x, int y, const char* name, attitudes attitude);
-	//virtual void move(int x, int y);
 };

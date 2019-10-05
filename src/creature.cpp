@@ -35,3 +35,32 @@ void Creature::setPosition(unsigned x, unsigned y)
 	if (x < 9 && y < 9)
 		this->position = { x,y };
 }
+
+bool Creature::move(MoveDirection direction)
+{
+	//NPC can't go out of the room.
+	int newX = position.first;
+	int newY = position.second;
+	switch (direction)
+	{
+	case MoveDirection::up:
+		newY++;
+		break;
+	case MoveDirection::down:
+		newY--;
+		break;
+	case MoveDirection::left:
+		newX--;
+		break;
+	case MoveDirection::right:
+		newX++;
+		break;
+	}
+	if (game->globalMap->isOutOfRange(newX, newY)) {
+		return false;//out of range
+	}
+	else {
+		position = { newX,newY };
+		return true;
+	}
+}

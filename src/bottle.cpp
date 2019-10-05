@@ -1,4 +1,6 @@
 #include "bottle.h"
+#include "game.h"
+extern std::shared_ptr<Game> game;
 Bottle::Bottle(BottleType type, unsigned increased) {
 	this->increased = increased;
 	this->type = type;
@@ -51,12 +53,13 @@ bool Bottle::use(T& target) {
 					}
 				case BottleType::poison:
 					target.bePoisoned += this->increased;
+					target.beAttacked = true;
 				default:
 					return false;
 				}
 			}
 		}catch (std::exception& e) {
-			std::cout << e.what() << std::endl;
+			game->addInfo(e.what());
 			return false;
 		}
 	}

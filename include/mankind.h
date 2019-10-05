@@ -20,6 +20,7 @@ public:
 	std::vector<Monster*> follower;
 	Mankind(std::pair<int, int> position,const char* name, Role role, attitudes attitude);
 	bool conjure(Monster* object);
+	bool attack(Creature& beAttack) override;
 	const char* getInfo() override;
 	void interactiveThis() override {};
 	int getAttack() override;

@@ -170,5 +170,21 @@ void Game::drawMap()
 }
 void Game::nextRound()
 {
-
+	for (auto& charac : characters) {
+		for (int i = 4; i > 0; i--) {
+			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
+				i++;//move failed, try again;
+		}
+		if (charac->attitude == attitudes::agressive||charac->beAttacked==true) {//attack randomly
+			
+		}
+		if (charac->bePoisoned > 0) {
+			charac->health -= charac->bePoisoned * 2;//health loss of ponison
+			charac->bePoisoned--;
+		}
+		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr) {
+			//if it is monster, rest controlled rounds decrease
+			monsterChar->beControlled--;
+		}
+	}
 }
