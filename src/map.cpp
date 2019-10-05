@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include "gameObject.h"
+
 Map::Map() {
 	for (int i = 0; i < 9; i++)
 	{
@@ -58,11 +59,15 @@ int Map::getPortal() {
 	return 0;
 	//return enable_portal;
 }
+std::vector<gameObject*> & Map::getObjectList() {
+	return objectlist;
+}
 void Map::distributeThings(const std::vector<gameObject*>& items) {
 	for (int i = 0; i < items.size(); i++) {
 		int rand_x = (std::rand() % 9), rand_y = (std::rand() % 9);
 		if (nullptr == ((mapcontent[rand_x])[rand_y])) {
 			((mapcontent[rand_x])[rand_y]) = items[i];
+			objectlist.push_back(items[i]);
 			if(ObjectType::creature==items[i]->getType()){
 				Creature* cret = static_cast<Creature*>(items[i]);
 				cret->setPosition(rand_x, rand_y);
@@ -74,6 +79,9 @@ void Map::distributeThings(const std::vector<gameObject*>& items) {
 	}
 }
 void Map::eraseGameObjectat(int x, int y) {
+	if (nullptr == (mapcontent[x])[y]) {
+		objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[x])[y]));
+	}
 	(mapcontent[x])[y] = nullptr;
 }
 std::vector<std::string> Map::drawablemap() {
@@ -99,6 +107,7 @@ std::vector<std::string> Map::drawablemap() {
 	return drawable;
 }
 void Map::setGameObjectat(int x, int y, gameObject* gameobj) {
+	objectlist.push_back(gameobj);
 	(mapcontent[x])[y] = gameobj;
 }
 
