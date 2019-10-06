@@ -105,6 +105,7 @@ void Game::init()
 
 void Game::start()
 {
+	resize_term(34, 100);
 	attrset(A_REVERSE);
 	for (int i = 0; i < COLS; ++i)
 		mvaddch(0, i, ' ');
@@ -116,12 +117,14 @@ void Game::start()
 	echo();
 	auto name = new char[20];
 	flushinp(); //flush the input
-	inputName:
+inputName:
 	getnstr(name, 20);
-	if (strlen(name) == 0)
+	if (strlen(name) == 0) {
+		move(LINES / 2 - 2, COLS / 2 - 4);
 		goto inputName;//reinput
+	}
 	move(LINES / 2 - 2, 0);
-	clrtoeol();
+	clrtobot();
 	noecho();
 	mvprintw(4, COLS / 2 - 27, "Please select a role:");
 	const string roles[] = {
@@ -192,12 +195,11 @@ void Game::start()
 	bool moveStatus = true;
 	while (true)
 	{
-		if (moveStatus) {
-			drawMap();
-			drawPlayer();
-		}
+		drawMap();
+		drawPlayer();
 		drawPlayerStatus();
 		moveStatus = false;
+		auto oldPosition = player->position;
 		ch = getch();
 		switch (ch)
 		{
@@ -212,6 +214,7 @@ void Game::start()
 			{
 			case MenuType::NextRound:
 				nextRound();
+				drawMap();
 				break;
 			default:
 				break;
@@ -237,13 +240,55 @@ void Game::start()
 		default:
 			break;
 		}
+		if (moveStatus) {
+			auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
+			if (abs(oldPosition.first - player->position.first) > 1) {
+				if (player->position.first == 0) {
+					// right
+					if (!globalMainMap->isOutOfRange(x + 1, y)) {
+						globalMainMap->SetMapLocation(x + 1, y);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+				}
+				else {
+					// left
+					if (!globalMainMap->isOutOfRange(x - 1, y)) {
+						globalMainMap->SetMapLocation(x - 1, y);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+				}
+			}
+			else if (abs(oldPosition.second - player->position.second) > 1) {
+				if (player->position.second == 0) {
+					// up
+					if (!globalMainMap->isOutOfRange(x, y + 1)) {
+						globalMainMap->SetMapLocation(x, y + 1);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+				}
+				else {
+					// down
+					if (!globalMainMap->isOutOfRange(x, y - 1)) {
+						globalMainMap->SetMapLocation(x, y - 1);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+				}
+			}
+		}
 
 	}
 }
 
 void Game::drawBackPack()
 {
-
+	if (backpackWin != nullptr) {
+		delwin(backpackWin);
+		touchwin(stdscr);
+		refresh();
+	}
+	backpackWin = subwin(status, 11, 18, 2, 63);
+	wborder(backpackWin, '|', '|', '-', '-', '+', '+', '+', '+');
+	wrefresh(backpackWin);
 }
 /*
 	name: name
@@ -511,12 +556,11 @@ void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
 
-	//regenerate balltes
-	auto item = std::vector<gameObject*>{
-		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
-		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
-	};
-	globalMap->distributeThings(item);
+	//regenerate bottles
+	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
+		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
+		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 
 	for (auto& charac : characters)
 	{
