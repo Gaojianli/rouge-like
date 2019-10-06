@@ -154,12 +154,12 @@ void Game::start()
 	clrtobot();
 	refresh();
 	drawMain();
-	drawMap();
 	WINDOW **menu = nullptr;
 	bool menuEnable[7] = { true,true,true,true,true,true,true };
 	MenuType menuChoose = MenuType::Attack;
 	while (true)
 	{
+		drawMap();
 		ch = getch();
 		switch (ch)
 		{
@@ -171,6 +171,23 @@ void Game::start()
 			menu = drawMenu(menuEnable);
 			menuChoose = scrollMenu(menu, 7, menuEnable);
 			deleteMenu(menu, 8);
+			break;
+		case 'W': // move
+		case 'w':
+			player->move(MoveDirection::up);
+			break;
+		case 'S':
+		case 's':
+			player->move(MoveDirection::down);
+			break;
+		case 'A':
+		case 'a':
+			player->move(MoveDirection::left);
+			break;
+		case 'D':
+		case 'd':
+			player->move(MoveDirection::right);
+			break;
 		default:
 			break;
 		}
