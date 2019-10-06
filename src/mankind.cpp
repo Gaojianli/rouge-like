@@ -1,12 +1,20 @@
 #include "mankind.h"
 #include "weapons.h"
-Mankind::Mankind(std::pair<int,int> postion,const char* name, Role role):Creature(postion.first,postion.second,name,attitudes::friendly)
+#include <string>
+#include "game.h"
+extern std::shared_ptr<Game> game;
+Mankind::Mankind(std::pair<int, int> position, const char *name, Role role, attitudes attitude) : Creature(position.first, position.second, name, attitude), role(role)
 {
 	switch (role)
 	{
 	case Role::magician:
 		this->health = this->healthUpper = 114;
 		this->mana = this->manaUpper = 514;
+		this->power = 9;
+		break;
+	case Role::wizard:
+		this->health = this->healthUpper = 140;
+		this->mana = this->manaUpper = 400;
 		this->power = 9;
 		break;
 	case Role::amazon:
@@ -38,45 +46,94 @@ Mankind::Mankind(std::pair<int,int> postion,const char* name, Role role):Creatur
 }
 
 //control a monster, return true if succeed
-bool Mankind::conjure(Monster* object)
+bool Mankind::conjure(Monster *object)
 {
-	if (this->mana > object->power) {//enough mana
+	if (this->mana > object->power)
+	{ //enough mana
 		this->mana -= object->power;
-		object->beControlled = 5;//control 5 rounds
+		object->beControlled = 5; //control 5 rounds
 		return true;
 	}
 	else
 		return false;
 }
 
-bool Mankind::attack(Creature& beAttack)
+const char *Mankind::getInfo()
+{
+	const std::string roles[] = {
+		"magician",
+		"wizard",
+		"warrior",
+		"harpy",
+		"amazon",
+		"dwarf",
+		"monkey"};
+	/*
+	example:A magician. Which power is 5. Very dangerous.
+	*/
+	std::string introduction = "A ";
+	introduction += roles[(int)role];
+	introduction += ". Which power is " + std::to_string(this->power);
+	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
+	return introduction.c_str();
+}
+
+int Mankind::getAttack()
+{
+	int attackSum = power;
+	for (auto &i : backpack)
+	{
+		if (i.getItemType() == ItemType::weapons)
+		{
+			attackSum += static_cast<Weapons &>(i).attack;
+		}
+	}
+	return attackSum;
+}
+
+int Mankind::getDefense()
+{
+	int defenseSum = power;
+	for (auto &i : backpack)
+	{
+		if (i.getItemType() == ItemType::weapons)
+		{
+			defenseSum += static_cast<Weapons &>(i).defense;
+		}
+	}
+	return defenseSum;
+}
+
+bool Mankind::attack(Creature &beAttack)
 {
 	beAttack.beAttacked = true;
 	//calculate attack sum
-	int attackSum = power;
-	for (auto &i : backpack) {
-		if (i.getItemType() == ItemType::weapons) {
-			attackSum += static_cast<Weapons&>(i).attack;
-		}
-	}
+	int attackSum = this->getAttack();
 	//calculate defends sum
-	int defenseSum = beAttack.power;
-	try {
-		auto beAttackMankind = dynamic_cast<Mankind&>(beAttack);//attack monster
-		for (auto& i : beAttackMankind.backpack) {
-			if (i.getItemType() == ItemType::weapons) {
-				defenseSum += static_cast<Weapons&>(i).defense;
-			}
-		}
-	}
-	catch (std::bad_cast&) {
-		defenseSum = beAttack.power;
-	}
+	int defenseSum = beAttack.getDefense();
 	if (attackSum < defenseSum)
-		return false;//nothing happend;
+		return false; //nothing happened
 	else
 		beAttack.health -= attackSum - defenseSum;
 	if (beAttack.health < 0)
 		beAttack.died();
+	for (auto &i : follower)
+	{ //monster be controlled will attack same object
+		i->attack(beAttack);
+	}
 	return true;
+}
+
+bool Mankind::pick(Item &toPick)
+{
+	if (backpack.size() <= 4) //backpack is full
+	{
+		this->backpack.push_back(toPick);
+		return true;
+	}
+	else
+		return false;
+}
+CreatureType Mankind::getCreatureType() {
+	return CreatureType::human;
 }

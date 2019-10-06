@@ -1,27 +1,35 @@
 #include "monster.h"
 #include "weapons.h"
-bool Monster::attack(Creature& beAttack)
+#include <string>
+const char *Monster::getInfo()
 {
-	beAttack.beAttacked = true;
-	int attackSum = power;
-	//calculate defends sum
-	int defenseSum = beAttack.power;
-	try {
-		auto beAttackMankind = dynamic_cast<Mankind&>(beAttack);//attack monster
-		for (auto &i : beAttackMankind.backpack) {
-			if (i.getItemType() == ItemType::weapons) {
-				defenseSum += static_cast<Weapons&>(i).defense;
-			}
-		}
-	}
-	catch (std::bad_cast) {
-		defenseSum = beAttack.power;
-	}
-	if (attackSum < defenseSum)
-		return false;//nothing happend;
-	else
-		beAttack.health -= attackSum - defenseSum;
-	if (beAttack.health < 0)
-		beAttack.died();
-	return true;
+	const std::string monsterTypes[] = {
+		"slime",
+		"skeleton",
+		"dragon",
+		"snake",
+		"tarrasque"};
+	std::string introduction = "A ";
+	introduction += monsterTypes[(int)type];
+	introduction += ". Which power is " + std::to_string(this->power);
+	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
+	return introduction.c_str();
+}
+
+Monster::Monster(std::pair<int, int> position, const char *name, MonsterType type, attitudes attitude)
+	: Creature(position.first, position.second, name, attitude), type(type), beControlled(0)
+{
+}
+
+int Monster::getAttack()
+{
+	return this->power;
+}
+
+int Monster::getDefense()
+{
+	return this->power;
+}
+CreatureType Monster::getCreatureType() {
+	return CreatureType::monster;
 }
