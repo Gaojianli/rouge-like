@@ -704,7 +704,8 @@ void Game::nextRound()
 void Game::printHelp()
 {
 	addInfo("Legends:");
-	addInfo("()   --Monster");
+	addInfo("()   --Mankind");
+	addInfo("{}   --Monster");
 	addInfo("<>   --Items");
 	addInfo("n/nn --Doors");
 	addInfo("/\\   --Player");
