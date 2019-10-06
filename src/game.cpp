@@ -178,7 +178,7 @@ void Game::start()
 	refresh();
 	drawMain();
 	WINDOW** menu = nullptr;
-	bool menuEnable[8] = { true,true,true,true,true,true,true,true};
+	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
 	while (true)
 	{
@@ -225,7 +225,7 @@ void Game::start()
 		default:
 			break;
 		}
-		
+
 	}
 }
 
@@ -241,7 +241,7 @@ void Game::drawPlayer()
 		refresh();
 	}
 	playerWin = subwin(map, 1, 2, 11 - player->position.second, 2 + player->position.first * 2);
-	wprintw(playerWin,"/\\");
+	wprintw(playerWin, "/\\");
 	wrefresh(playerWin);
 }
 /*
@@ -265,7 +265,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 		"Help",
 		"Exit" };
 	int i;
-	WINDOW** items = new WINDOW*[9];
+	WINDOW** items = new WINDOW * [9];
 
 	items[0] = newwin(11, 16, 2, 22);
 	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
@@ -457,6 +457,14 @@ void Game::drawMap()
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
+
+	//regenerate balltes
+	auto item = std::vector<gameObject*>{
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+	};
+	globalMap->distributeThings(item);
+
 	for (auto& charac : characters)
 	{
 		for (int i = 4; i > 0; i--)
