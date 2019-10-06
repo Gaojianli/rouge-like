@@ -30,6 +30,11 @@ bool Player::move(MoveDirection direction)
 	if (movePoints == 0) {//can't move again this round
 		return false;
 	}
+	if (game->globalMap->getPortal() != 0) {
+		for (int i = 0; i < 4;i++) {
+			gates[i] = true;
+		}
+	}
 	if (newX > 8 || newX < 0)
 	{ //detect door
 		if (newY == 4)
