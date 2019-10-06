@@ -127,6 +127,35 @@ void Map::eraseGameObjectAt(int x, int y)
 	}
 	(mapcontent[y])[x] = nullptr;
 }
+gameObject* Map::pickObjectAt(int x, int y) {
+	gameObject* src = (mapcontent[y])[x];
+	(mapcontent[y])[x] = nullptr;
+	return src;
+}
+Item* Map::pickItemAt(int x, int y) {
+	if (nullptr == (mapcontent[y])[x]) {
+		return nullptr;
+	}
+	else if (ObjectType::item != (mapcontent[y])[x]->getType()) {
+		return nullptr;
+	}
+	else
+	{
+		return static_cast<Item*>((mapcontent[y])[x]);
+	}
+}
+void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
+	if (nullptr != (mapcontent[dst_y])[dst_x]) {
+		return;
+	}
+	else if((mapcontent[src_y])[src_x])
+	{
+		return;
+	}
+	else {
+		(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
+	}
+}
 std::vector<std::string> Map::drawablemap()
 {
 	std::vector<std::string> drawable;
