@@ -12,7 +12,7 @@ ObjectType Creature::getType()
 
 void Creature::died()
 {
-	game->globalMap->eraseGameObjectAt(position.first, position.second);
+	game->globalMap->eraseGameObjectAt(position.first, position.second, false);
 	game->characters.remove(this);
 	delete this;
 }

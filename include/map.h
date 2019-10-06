@@ -21,6 +21,7 @@ public:
 	void distributeThings(const std::vector<gameObject*>& items); // Automatically distribute objects on the map
 	void randomSetThings(gameObject* item);
 	void eraseGameObjectAt(int x, int y); // Erase object on certain location of the map, This will free the item!!!
+	void eraseGameObjectAt(int x, int y, bool freeMemory); // Erase object on certain location of the map, This will free the item!!!
 	gameObject* pickObjectAt(int x, int y); // Remove a gameobject from location and return it.
 	Item* pickItemAt(int x, int y); // Same to above, but do nothing when it's not an item and return nullptr
 	void moveObject(int src_x, int src_y, int dst_x, int dst_y); // Move src to dst , if dst have things, silently fail

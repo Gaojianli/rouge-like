@@ -37,7 +37,7 @@ MainMap::MainMap()
 			{
 				oneMap.setDisabledGate(2);
 			}
-			if ((mapSize - 1) == j)
+			else if ((mapSize - 1) == j)
 			{
 				oneMap.setDisabledGate(3);
 			}

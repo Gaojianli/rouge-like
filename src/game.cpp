@@ -258,7 +258,7 @@ inputName:
 			case MenuType::Backpack:
 				drawBackPack();
 				backpackScroll = scrollBackpack();
-				useOrThrowBackpack(backpackScroll);
+				if(backpackScroll != -1) useOrThrowBackpack(backpackScroll);
 				break;
 			case MenuType::PickUp:
 				pickup();
@@ -310,12 +310,19 @@ inputName:
 					if (!globalMainMap->isOutOfRange(x + 1, y)) {
 						globalMainMap->SetMapLocation(x + 1, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
+						globalMainMap->SetMapLocation(x - 3, y);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 					}
 				}
 				else {
 					// left
 					if (!globalMainMap->isOutOfRange(x - 1, y)) {
 						globalMainMap->SetMapLocation(x - 1, y);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x + 3, y)) {
+						globalMainMap->SetMapLocation(x + 3, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 					}
 				}
@@ -327,11 +334,19 @@ inputName:
 						globalMainMap->SetMapLocation(x, y + 1);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y - 3)) {
+						globalMainMap->SetMapLocation(x, y - 3);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
 				}
 				else {
 					// down
 					if (!globalMainMap->isOutOfRange(x, y - 1)) {
 						globalMainMap->SetMapLocation(x, y - 1);
+						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y + 3)) {
+						globalMainMap->SetMapLocation(x, y + 3);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 					}
 				}
@@ -457,20 +472,6 @@ void Game::drawBackPack()
 	for (auto i : player->backpack) showItemInWin(backpackWin[5 + (count++)], i);
 	for (; count < 4; count++) showItemInWin(backpackWin[5 + count], nullptr);
 	wrefresh(backpackWin[0]);
-}
-void showItemInWin(WINDOW* win, Item& item) {
-	switch (item.getItemType())
-	{
-	case ItemType::bottle:
-		mvwaddstr(win, 0, 0, "");
-		break;
-	case ItemType::key:
-		break;
-	case ItemType::weapons:
-		break;
-	default:
-		break;
-	}
 }
 /*
 	name: name
@@ -654,11 +655,13 @@ bool Game::useOrThrowBackpack(int backpackIndex)
 	auto playerItem = player->backpack[backpackIndex];
 	if (\
 		playerItem->getItemType() == ItemType::weapons || \
-		(playerItem->getItemType() == ItemType::key && dynamic_cast<Key*>(playerItem)->used == false)\
+		(playerItem->getItemType() == ItemType::key && dynamic_cast<Key*>(playerItem)->used)\
 	)
 	{
 		wbkgd(item[1], COLOR_INVALID);
 		wnoutrefresh(item[1]);
+		wbkgd(item[2], COLOR_SELECTED);
+		wnoutrefresh(item[2]);
 		canUse = false;
 		selected = 1;
 	}
@@ -977,6 +980,9 @@ void Game::addInfo(const wchar_t* message)
 
 void Game::drawMap()
 {
+	delwin(map);
+	map = subwin(stdscr, 11, 20, 2, 1);
+	wborder(map, '|', '|', '-', '-', '+', '+', '+', '+');
 	auto mapStr = globalMap->drawablemap();
 	auto gates = globalMap->getGates();
 	for (int i = 0; i < 9; i++)
@@ -1090,22 +1096,22 @@ void Game::nextRound()
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
 						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
-						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second);
+						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first - 1, creatureObj->position.second) == ObjectType::item)
 					{
 						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
-						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second);
+						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second + 1) == ObjectType::item)
 					{
 						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
-						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1);
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second - 1) == ObjectType::item)
 					{
 						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
-						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1);
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1, false);
 					}
 				}
 			}
@@ -1171,7 +1177,7 @@ void Game::conjoure()
 	if (conjoureDirec == Directions::win) return;
 	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
 	if (status)
-		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1], false);
 }
 void Game::pickup()
 {
@@ -1201,7 +1207,7 @@ void Game::pickup()
 		) 															\
 	);
 	if (status)
-		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1]);
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1], false);
 }
 void Game::gotoWin()
 {
