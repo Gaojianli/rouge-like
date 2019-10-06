@@ -829,11 +829,6 @@ void Game::nextRound()
 
 	for (auto& charac : characters)
 	{
-		for (int i = 4; i > 0; i--)
-		{
-			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
-				i++; //move failed, try again;
-		}
 		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
 		{ //attack randomly
 		}
@@ -845,7 +840,8 @@ void Game::nextRound()
 		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
-			monsterChar->beControlled--;
+			if (monsterChar->beControlled > 0)
+				monsterChar->beControlled--;
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
@@ -863,8 +859,10 @@ void Game::nextRound()
 				};
 				for (int i = 4; i > 0; i--)
 				{
-					if (creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
+					if (!creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
 						i++; //move failed, try again;
+					else
+						globalMap->setGameObjectat(creatureObj->position.first, creatureObj->position.second, creatureObj);
 				}
 				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true)
 				{ //attack randomly
@@ -958,5 +956,7 @@ void Game::conjoure()
 		}
 	}
 	auto conjoureDirec = scrollDirections(directions);
-	player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+	if (status)
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
 }
