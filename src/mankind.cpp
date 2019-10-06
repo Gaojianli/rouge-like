@@ -85,9 +85,9 @@ int Mankind::getAttack()
 	int attackSum = power;
 	for (auto &i : backpack)
 	{
-		if (i.getItemType() == ItemType::weapons)
+		if (i->getItemType() == ItemType::weapons)
 		{
-			attackSum += static_cast<Weapons &>(i).attack;
+			attackSum += static_cast<Weapons *>(i)->attack;
 		}
 	}
 	return attackSum;
@@ -98,9 +98,9 @@ int Mankind::getDefense()
 	int defenseSum = power;
 	for (auto &i : backpack)
 	{
-		if (i.getItemType() == ItemType::weapons)
+		if (i->getItemType() == ItemType::weapons)
 		{
-			defenseSum += static_cast<Weapons &>(i).defense;
+			defenseSum += static_cast<Weapons *>(i)->defense;
 		}
 	}
 	return defenseSum;
@@ -126,7 +126,7 @@ bool Mankind::attack(Creature &beAttack)
 	return true;
 }
 
-bool Mankind::pick(Item &toPick)
+bool Mankind::pick(Item *toPick)
 {
 	if (backpack.size() <= 4) //backpack is full
 	{
