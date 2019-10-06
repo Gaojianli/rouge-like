@@ -71,6 +71,12 @@ void Game::init()
 		}
 	}
 	globalMap = std::make_shared<Map>(Map());
+	auto item = std::vector<gameObject*>{
+		new Bottle(BottleType::bloodBottle, 10),
+		new Bottle(BottleType::bloodBottle, 10),
+		new Bottle(BottleType::bloodBottle, 10),
+	};
+	globalMap->distributeThings(item);
 }
 
 void Game::start()
@@ -160,6 +166,7 @@ void Game::start()
 	while (true)
 	{
 		drawMap();
+		drawPlayer();
 		ch = getch();
 		switch (bool moveStatus = false; ch)
 		{
@@ -202,12 +209,12 @@ void Game::drawPlayer()
 {
 	if (playerWin != nullptr) {
 		delwin(playerWin);
-		free(playerWin);
 		touchwin(stdscr);
 		refresh();
 	}
-	playerWin = (WINDOW*)malloc(sizeof(WINDOW));
-	//playerWin = subwin(map, 1, 2, )
+	playerWin = subwin(map, 1, 2, 11 - player->position.second, 2 + player->position.first * 2);
+	wprintw(playerWin,"/\\");
+	wrefresh(playerWin);
 }
 /*
 	Investigation
@@ -368,12 +375,6 @@ void Game::addInfo(const char *message)
 
 void Game::drawMap()
 {
-	auto item = std::vector<gameObject *>{
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-	};
-	globalMap->distributeThings(item);
 	auto mapStr = globalMap->drawablemap();
 	auto gates = globalMap->getGates();
 	for (int i = 0; i < 9; i++)
