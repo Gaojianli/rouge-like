@@ -230,13 +230,10 @@ inputName:
 			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
 			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
-			menuEnable[static_cast<int>(MenuType::Investigate)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
-			case MenuType::Investigate:
-				investigate();
-				break;
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -391,7 +388,7 @@ void Game::drawPlayer()
 }
 
 /*
-	Investigate
+	Investigation
 	Attack
 	Control
 	Pick up
@@ -402,7 +399,7 @@ void Game::drawPlayer()
 WINDOW** Game::drawMenu(bool* menuEnable)
 {
 	const char* muneStr[]{
-		"Investigate",
+		"Investigation",
 		"Attack",
 		"Control",
 		"Pick up",
@@ -500,22 +497,22 @@ void Game::drawMain()
 	refresh();
 }
 
-template<typename Callback>
-bool _isAround(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, Callback _callback) {
+bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
 	auto x = playerPosition.first, y = playerPosition.second;
 	auto flag = false;
 	for (auto direction : directionTable) {
 		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
-			_callback(x + direction[0], y + direction[1], flag);
+			pf(x + direction[0], y + direction[1], flag);
+
 		}
 	}
 	return flag;
 }
 
 bool Game::isAround(ObjectType target) {
-	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
+	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
@@ -524,7 +521,7 @@ bool Game::isAround(ObjectType target) {
 
 bool Game::canControlAround()
 {
-	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
+	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == ObjectType::creature) {
 			auto creature = globalMap->getLocationCreature(x, y);
 			auto monster = dynamic_cast<Monster*>(creature);
@@ -703,24 +700,4 @@ void Game::printHelp()
 	addInfo("Helps:");
 	addInfo("w/a/s/d --Move player");
 	addInfo("m       --Show/Hide menu");
-}
-
-void Game::investigate(){
-	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
-	auto playerPosition = player->position;
-	auto x = playerPosition.first, y = playerPosition.second;
-	auto flag = false;
-	for (auto direction : directionTable) {
-		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
-			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
-				gameObject* toInvestigate;
-				if (objectType == ObjectType::creature)
-					toInvestigate = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
-				else
-					toInvestigate = globalMap->getLocationItem(x + direction[0], y + direction[1]);
-				addInfo("Investigate result:");
-				addInfo(toInvestigate->getInfo().c_str());
-			}
-		}
-	}
 }

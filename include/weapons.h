@@ -15,5 +15,5 @@ public:
 	unsigned mana;
 	Weapons(WeaponsType type, int attack, int defense, unsigned power);
 	ItemType getItemType();
-	std::string getInfo() override;
+	const char *getInfo() override;
 };

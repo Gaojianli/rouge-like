@@ -15,6 +15,6 @@ public:
 	ObjectType getType();
 	virtual ItemType getItemType();
 	virtual void newRoundStarts(){};
-	std::string getInfo();
+	const char *getInfo() override { return NULL; };
 	void interactiveThis() override{};
 };

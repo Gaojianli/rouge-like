@@ -58,7 +58,7 @@ bool Mankind::conjure(Monster *object)
 		return false;
 }
 
-std::string Mankind::getInfo()
+const char *Mankind::getInfo()
 {
 	const std::string roles[] = {
 		"magician",
@@ -75,7 +75,7 @@ std::string Mankind::getInfo()
 	introduction += roles[(int)role];
 	introduction += ". Which power is " + std::to_string(this->power);
 	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
-	return introduction;
+	return introduction.c_str();
 }
 
 int Mankind::getAttack()

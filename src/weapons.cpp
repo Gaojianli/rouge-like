@@ -1,5 +1,4 @@
 #include "weapons.h"
-#include <string>
 Weapons::Weapons(WeaponsType type, int attack, int defense, unsigned power)
 {
 	this->type = type;
@@ -11,7 +10,7 @@ ItemType Weapons::getItemType()
 {
 	return ItemType::weapons;
 }
-std::string Weapons::getInfo()
+const char *Weapons::getInfo()
 {
 	const std::string weaponsTypeStr[] = {
 		"cane",
@@ -26,18 +25,18 @@ std::string Weapons::getInfo()
 	describe += "It can provide ";
 	if (this->attack > 0)
 	{
-		describe += std::to_string(this->attack);
+		describe += this->attack;
 		describe += " attack ";
 	}
 	if (this->defense > 0)
 	{
-		describe += std::to_string(this->defense);
+		describe += this->defense;
 		describe += " defense ";
 	}
 	if (this->mana > 0)
 	{
-		describe += std::to_string(this->mana);
+		describe += this->mana;
 		describe += " mana ";
 	}
-	return describe;
+	return describe.c_str();
 }
