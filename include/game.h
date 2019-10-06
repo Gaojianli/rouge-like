@@ -25,7 +25,7 @@ private:
 	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
 	WINDOW *menubar, *map, *info, *status, *playerWin;
-	std::string infoList[17];
+	std::wstring infoList[17];
 	int header = 0;
 	MainMap mainmap;
 	void drawMain();
@@ -44,4 +44,5 @@ public:
 	void init(); //create player
 	void start();
 	void addInfo(const char *message);
+	void addInfo(const wchar_t * message);
 };
