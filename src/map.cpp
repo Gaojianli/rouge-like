@@ -125,11 +125,13 @@ void Map::eraseGameObjectAt(int x, int y)
 	{
 		objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[y])[x]));
 	}
+	free((mapcontent[y])[x]);
 	(mapcontent[y])[x] = nullptr;
 }
 gameObject* Map::pickObjectAt(int x, int y) {
 	gameObject* src = (mapcontent[y])[x];
 	(mapcontent[y])[x] = nullptr;
+	objectlist.erase(std::find(objectlist.begin(), objectlist.end(), src));
 	return src;
 }
 Item* Map::pickItemAt(int x, int y) {
@@ -141,7 +143,7 @@ Item* Map::pickItemAt(int x, int y) {
 	}
 	else
 	{
-		return static_cast<Item*>((mapcontent[y])[x]);
+		return static_cast<Item*>(pickObjectAt(x,y));
 	}
 }
 void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
@@ -155,6 +157,9 @@ void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
 	else {
 		(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
 		(mapcontent[src_y])[src_x] = nullptr;
+		if (ObjectType::creature==(mapcontent[dst_y])[dst_x]->getType()) {
+			static_cast<Creature*>((mapcontent[dst_y])[dst_x])->setPosition(dst_x, dst_y);
+		}
 	}
 }
 std::vector<std::string> Map::drawablemap()
