@@ -10,9 +10,8 @@ enum class Directions
 };
 class Key : public Item
 {
-	bool used = false;
-
 public:
+	bool used = false;
 	Directions direction;
 	unsigned step;
 	Key(Directions direction, unsigned step);
