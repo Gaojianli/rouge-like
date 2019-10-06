@@ -67,7 +67,7 @@ int MainMap::GetMapYLocation()
 {
 	return mainmap_y;
 }
-bool isOutOfRange(int x, int y)
+bool MainMap::isOutOfRange(int x, int y)
 {
 	if ((x < 0) || (x >= mapSize) || (y < 0) || (y >= mapSize))
 	{
