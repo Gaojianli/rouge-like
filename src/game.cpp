@@ -310,9 +310,11 @@ inputName:
 					if (!globalMainMap->isOutOfRange(x + 1, y)) {
 						globalMainMap->SetMapLocation(x + 1, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You enter the room on the right.");
 					}else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
 						globalMainMap->SetMapLocation(x - 3, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You pass through the portal to the far left of the map.");
 					}
 				}
 				else {
@@ -320,10 +322,12 @@ inputName:
 					if (!globalMainMap->isOutOfRange(x - 1, y)) {
 						globalMainMap->SetMapLocation(x - 1, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You enter the room on the left.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x + 3, y)) {
 						globalMainMap->SetMapLocation(x + 3, y);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You pass through the portal to the far right of the map.");
 					}
 				}
 			}
@@ -333,10 +337,12 @@ inputName:
 					if (!globalMainMap->isOutOfRange(x, y + 1)) {
 						globalMainMap->SetMapLocation(x, y + 1);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You enter the room on the up.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y - 3)) {
 						globalMainMap->SetMapLocation(x, y - 3);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You pass through the portal to the far down of the map.");
 					}
 				}
 				else {
@@ -344,10 +350,12 @@ inputName:
 					if (!globalMainMap->isOutOfRange(x, y - 1)) {
 						globalMainMap->SetMapLocation(x, y - 1);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You enter the room on the down.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y + 3)) {
 						globalMainMap->SetMapLocation(x, y + 3);
 						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						addInfo("You pass through the portal to the far up of the map.");
 					}
 				}
 			}
