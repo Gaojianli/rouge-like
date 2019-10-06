@@ -32,6 +32,7 @@ Defined by this header:
 #define PDC_VER_MAJOR   3
 #define PDC_VER_MINOR   9
 #define PDC_VERDOT   "3.9"
+#define PDC_WIDE
 
 #define CHTYPE_LONG     1      /* chtype >= 32 bits */
 

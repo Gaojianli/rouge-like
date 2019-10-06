@@ -24,23 +24,24 @@ class Game
 private:
 	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
-	WINDOW *menubar, *map, *info, *status;
+	WINDOW *menubar, *map, *info, *status, *playerWin;
 	std::string infoList[17];
 	int header = 0;
 	MainMap mainmap;
-
+	void drawMain();
+	void drawMap();
+	void drawBackPack();
+	void drawPlayer();
+	WINDOW** drawMenu(bool* menuEnable);
+	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);
+	void deleteMenu(WINDOW** items, int count);
+	bool isAround(ObjectType target);
+	bool canControlAround();
+	void nextRound();
 public:
 	std::shared_ptr<Map> globalMap;
 	Game() = default;
 	void init(); //create player
 	void start();
-	void drawMain();
-	WINDOW **drawMenu(bool *menuEnable);
-	MenuType scrollMenu(WINDOW **items, int count, bool *menuEnable);
-	bool isAround(ObjectType target);
-	bool canControlAround();
-	void deleteMenu(WINDOW **items, int count);
-	void nextRound();
 	void addInfo(const char *message);
-	void drawMap();
 };

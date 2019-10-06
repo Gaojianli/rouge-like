@@ -161,7 +161,7 @@ void Game::start()
 	{
 		drawMap();
 		ch = getch();
-		switch (ch)
+		switch (bool moveStatus = false; ch)
 		{
 		case 'M':
 		case 'm':
@@ -174,24 +174,40 @@ void Game::start()
 			break;
 		case 'W': // move
 		case 'w':
-			player->move(MoveDirection::up);
+			moveStatus = player->move(MoveDirection::up);
 			break;
 		case 'S':
 		case 's':
-			player->move(MoveDirection::down);
+			moveStatus = player->move(MoveDirection::down);
 			break;
 		case 'A':
 		case 'a':
-			player->move(MoveDirection::left);
+			moveStatus = player->move(MoveDirection::left);
 			break;
 		case 'D':
 		case 'd':
-			player->move(MoveDirection::right);
+			moveStatus = player->move(MoveDirection::right);
 			break;
 		default:
 			break;
 		}
 	}
+}
+
+void Game::drawBackPack()
+{
+
+}
+void Game::drawPlayer()
+{
+	if (playerWin != nullptr) {
+		delwin(playerWin);
+		free(playerWin);
+		touchwin(stdscr);
+		refresh();
+	}
+	playerWin = (WINDOW*)malloc(sizeof(WINDOW));
+	//playerWin = subwin(map, 1, 2, )
 }
 /*
 	Investigation
