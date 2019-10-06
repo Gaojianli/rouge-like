@@ -44,8 +44,8 @@ MainMap::MainMap()
 			thisLine.push_back(oneMap);
 		}
 		maps.push_back(thisLine);
-		std::reverse(maps.begin(), maps.end());
 	}
+	std::reverse(maps.begin(), maps.end());
 }
 bool MainMap::SetMapLocation(int x, int y)
 {
