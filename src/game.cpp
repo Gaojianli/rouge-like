@@ -404,7 +404,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 	const char* muneStr[]{
 		"Investigate",
 		"Attack",
-		"Control",
+		"Conjure",
 		"Pick up",
 		"Backpack",
 		"Next round",
