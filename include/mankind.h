@@ -2,7 +2,7 @@
 #include "creature.h"
 #include "monster.h"
 enum class Role {
-	magician,
+	magician=0,
 	wizard,
 	warrior,
 	harpy,
@@ -13,12 +13,17 @@ enum class Role {
 class Monster;
 class Mankind:public Creature {
 public:
-	unsigned mana;
-	unsigned manaUpper;
+	unsigned mana=0;
+	unsigned manaUpper=0;
 	std::vector<Item> backpack;
+	bool pick(Item& toPick);
+	Role role;
 	std::vector<Monster*> follower;
-	Mankind(std::pair<int, int> postion,const char* name, Role role);
+	Mankind(std::pair<int, int> position,const char* name, Role role, attitudes attitude);
 	bool conjure(Monster* object);
-	bool attack(Creature& beAttack);
+	bool attack(Creature& beAttack) override;
+	const char* getInfo() override;
 	void interactiveThis() override {};
+	int getAttack() override;
+	int getDefense() override;
 };
