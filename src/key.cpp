@@ -1,4 +1,5 @@
 #include "key.h"
+#include <string>
 ItemType Key::getItemType()
 {
 	return ItemType::key;
@@ -13,7 +14,7 @@ Key::Key(Directions direction, unsigned step)
 	this->step = step;
 	this->used = false;
 }
-const char *Key::getInfo()
+std::string Key::getInfo()
 {
 	const char *ordinal[] = {
 		"first",
@@ -41,7 +42,7 @@ const char *Key::getInfo()
 	describe += ordinal[this->step];
 	describe += " room ";
 	describe += directionsStr[static_cast<int>(this->direction)] + '.';
-	return describe.c_str();
+	return describe;
 }
 bool Key::useIt()
 {

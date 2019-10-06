@@ -9,7 +9,7 @@
 
 enum class MenuType
 {
-	Investigation = 0,
+	Investigate = 0,
 	Attack,
 	Control,
 	PickUp,
@@ -41,6 +41,7 @@ private:
 	bool canControlAround();
 	void nextRound();
 	void printHelp();
+	void investigate();
 public:
 	std::shared_ptr<Map> globalMap;
 	std::shared_ptr<MainMap> globalMainMap;
