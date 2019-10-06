@@ -25,7 +25,7 @@ class Game
 private:
 	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
-	WINDOW *menubar, *map, *info, *status, *playerWin, *backpackWin, *playerStatusWin;
+	WINDOW *menubar, *map, *info, *status, *playerWin, **backpackWin, *playerStatusWin;
 	std::wstring infoList[17];
 	int header = 0;
 	MainMap mainmap;

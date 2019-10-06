@@ -197,6 +197,7 @@ inputName:
 		drawMap();
 		drawPlayer();
 		drawPlayerStatus();
+		drawBackPack();
 		moveStatus = false;
 		auto oldPosition = player->position;
 		ch = getch();
@@ -281,13 +282,37 @@ inputName:
 void Game::drawBackPack()
 {
 	if (backpackWin != nullptr) {
-		delwin(backpackWin);
-		touchwin(stdscr);
-		refresh();
+		deleteMenu(backpackWin, 9);
 	}
-	backpackWin = subwin(status, 11, 18, 2, 63);
-	wborder(backpackWin, '|', '|', '-', '-', '+', '+', '+', '+');
-	wrefresh(backpackWin);
+	backpackWin = new WINDOW * [9];
+	backpackWin[0] = subwin(status, 11, 17, 2, 65);
+	wborder(backpackWin[0], '|', '|', '-', '-', '+', '+', '+', '+');
+	backpackWin[1] = subwin(backpackWin[0], 6, 9, 2, 65);
+	backpackWin[2] = subwin(backpackWin[0], 6, 9, 2, 73);
+	backpackWin[3] = subwin(backpackWin[0], 6, 9, 7, 65);
+	backpackWin[4] = subwin(backpackWin[0], 6, 9, 7, 73);
+
+	backpackWin[5] = subwin(backpackWin[1], 4, 7, 3, 66);
+	backpackWin[6] = subwin(backpackWin[2], 4, 7, 3, 74);
+	backpackWin[7] = subwin(backpackWin[3], 4, 7, 8, 66);
+	backpackWin[8] = subwin(backpackWin[4], 4, 7, 8, 74);
+	for (auto i : { 1,2,3,4 }) wborder(backpackWin[i], '|', '|', '-', '-', '+', '+', '+', '+');
+	
+	wrefresh(backpackWin[0]);
+}
+void showItemInWin(WINDOW *win, Item &item) {
+	switch (item.getItemType())
+	{
+	case ItemType::bottle:
+		mvwaddstr(win, 0, 0,"");
+		break;
+	case ItemType::key:
+		break;
+	case ItemType::weapons:
+		break;
+	default:
+		break;
+	}
 }
 /*
 	name: name
