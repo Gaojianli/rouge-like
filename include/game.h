@@ -40,6 +40,7 @@ private:
 	bool isAround(ObjectType target);
 	bool canControlAround();
 	void nextRound();
+	void printHelp();
 public:
 	std::shared_ptr<Map> globalMap;
 	std::shared_ptr<MainMap> globalMainMap;

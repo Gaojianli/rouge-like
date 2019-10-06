@@ -215,6 +215,12 @@ inputName:
 				nextRound();
 				drawMap();
 				break;
+			case MenuType::Help:
+				printHelp();
+				break;
+			case MenuType::Exit:
+				exit(0);
+				break;
 			default:
 				break;
 			}
@@ -634,4 +640,17 @@ void Game::nextRound()
 			}
 		}
 	}
+}
+
+void Game::printHelp()
+{
+	addInfo("Legends:");
+	addInfo("()   --Monster");
+	addInfo("<>   --Items");
+	addInfo("n/nn --Doors");
+	addInfo("/\\   --Player");
+	addInfo(" ");
+	addInfo("Helps:");
+	addInfo("w/a/s/d --Move player");
+	addInfo("m       --Show/Hide menu");
 }
