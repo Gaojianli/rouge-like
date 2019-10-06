@@ -18,5 +18,5 @@ public:
 	bool useIt();
 	void newRoundStarts();
 	ItemType getItemType();
-	const char *getInfo() override;
+	std::string getInfo() override;
 };

@@ -58,7 +58,7 @@ bool Mankind::conjure(Monster *object)
 		return false;
 }
 
-const char *Mankind::getInfo()
+std::string Mankind::getInfo()
 {
 	const std::string roles[] = {
 		"magician",
@@ -75,7 +75,7 @@ const char *Mankind::getInfo()
 	introduction += roles[(int)role];
 	introduction += ". Which power is " + std::to_string(this->power);
 	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
-	return introduction.c_str();
+	return introduction;
 }
 
 int Mankind::getAttack()
@@ -133,4 +133,7 @@ bool Mankind::pick(Item &toPick)
 	}
 	else
 		return false;
+}
+CreatureType Mankind::getCreatureType() {
+	return CreatureType::human;
 }

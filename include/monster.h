@@ -18,5 +18,6 @@ public:
 	MonsterType type;
 	int getAttack() override;
 	int getDefense() override;
-	const char *getInfo() override;
+	CreatureType getCreatureType() override;
+	std::string getInfo() override;
 };

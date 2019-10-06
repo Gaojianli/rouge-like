@@ -3,8 +3,7 @@
 extern std::shared_ptr<Game> game;
 Bottle::Bottle()
 {
-	int type = (std::rand() % 3);
-	switch (type)
+	switch (std::rand() % 3)
 	{
 	case 0:
 	{
@@ -37,29 +36,31 @@ ItemType Bottle::getItemType()
 {
 	return ItemType::bottle;
 }
-const char *Bottle::getInfo()
+std::string Bottle::getInfo()
 {
 	std::string describe = "";
 	switch (this->type)
 	{
 	case BottleType::bloodBottle:
 		describe += "A bottle full of blood.You can use it to restore ";
-		describe += this->increased;
+		describe += std::to_string(this->increased);
 		describe += " health.";
 		break;
 	case BottleType::manaBottle:
 		describe += "A bottle full of mana.You can use it to restore ";
-		describe += this->increased;
+		describe += std::to_string(this->increased);
 		describe += " mana.";
+		break;
 	case BottleType::poison:
 		describe += "A bottle full of poison.You can use it to ";
 		describe += "enchant the target to poison for ";
-		describe += this->increased;
+		describe += std::to_string(this->increased);
 		describe += " rounds.";
+		break;
 	default:
 		break;
 	}
-	return describe.c_str();
+	return describe;
 }
 template <typename T>
 bool Bottle::use(T &target)

@@ -48,57 +48,85 @@ void Game::init()
 	{
 		itemToDistribute.push_back(new Key(static_cast<Directions>(j), 1));
 	}
-	for (int k = 0; k < 3; k++) // Add Monster to item list
+	for (int k = 0; k < 12; k++) // Add sword to item list
 	{
-		switch (std::rand() % 5)
+		switch (std::rand() % 3)
 		{
-		case 0:
-		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+		case 0: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::sword, std::rand() % 5 + 5, 0, 0));
 			break;
 		}
-		case 1:
-		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+		case 1: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::shield, 0, std::rand() % 3 + 5, 0));
 			break;
 		}
-		case 2:
-		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
-			break;
-		}
-		case 3:
-		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
-			break;
-		}
-		case 4:
-		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+		case 2: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::cane, std::rand() % 3 + 3, 0, std::rand() % 20 + 20));
 			break;
 		}
 		default:
 			break;
 		}
-		// Init Maps.
-		globalMainMap = std::make_shared<MainMap>(MainMap());
-		// Roll Map.
-		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
-
-		// Send Items to Map
-
-		for (auto i : itemToDistribute) {
-			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+	}
+	for (int l = 0; l < 3; l++) // Add Monster to item list
+	{
+		switch (std::rand() % 5)
+		{
+		case 0:
+		{
+			Monster* m = new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
+			break;
 		}
-		/* // Test line
-		auto item = std::vector<gameObject*>{
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-		};
-		globalMap->distributeThings(item);
-		*/
+		case 1:
+		{
+			Monster* m = new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
+			break;
+		}
+		case 2:
+		{
+			Monster* m = new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
+			break;
+		}
+		case 3:
+		{
+			Monster* m = new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
+			break;
+		}
+		case 4:
+		{
+			Monster* m = new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	for (int m = 0; m < 3; m++) // Generate three human NPC
+	{
+		Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
+		itemToDistribute.push_back(p);
+		characters.push_back(p);
+	}
+	// Init Maps.
+	globalMainMap = std::make_shared<MainMap>(MainMap());
+	// Roll Map.
+	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+	globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+
+	// Send Items to Map
+
+	for (auto i : itemToDistribute) {
+		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
 	}
 }
 
@@ -183,7 +211,7 @@ inputName:
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({ rand()%9, rand()%9 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ rand() % 9, rand() % 9 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
@@ -210,7 +238,7 @@ inputName:
 			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
 			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
-			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Investigate)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
@@ -221,6 +249,10 @@ inputName:
 			case MenuType::PickUp:
 
 				break;
+			case MenuType::Investigate:
+				investigate();
+				break;
+			case MenuType::Control:
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -412,6 +444,20 @@ void Game::drawBackPack()
 	for (; count < 4; count++) showItemInWin(backpackWin[5 + count], nullptr);
 	wrefresh(backpackWin[0]);
 }
+void showItemInWin(WINDOW* win, Item& item) {
+	switch (item.getItemType())
+	{
+	case ItemType::bottle:
+		mvwaddstr(win, 0, 0, "");
+		break;
+	case ItemType::key:
+		break;
+	case ItemType::weapons:
+		break;
+	default:
+		break;
+	}
+}
 /*
 	name: name
 	role: role
@@ -458,7 +504,7 @@ void Game::drawPlayer()
 }
 
 /*
-	Investigation
+	Investigate
 	Attack
 	Control
 	Pick up
@@ -469,9 +515,9 @@ void Game::drawPlayer()
 WINDOW** Game::drawMenu(bool* menuEnable)
 {
 	const char* muneStr[]{
-		"Investigation",
+		"Investigate",
 		"Attack",
-		"Control",
+		"Conjure",
 		"Pick up",
 		"Backpack",
 		"Next round",
@@ -588,10 +634,10 @@ Directions Game::scrollDirections(bool* directionsEnable)
 	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
 	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
 	
-	waddwstr(direction[static_cast<int>(Directions::up)], L"¡ü");
-	waddwstr(direction[static_cast<int>(Directions::down)], L"¡ý");
-	waddwstr(direction[static_cast<int>(Directions::left)], L"¡û");
-	waddwstr(direction[static_cast<int>(Directions::right)], L"¡ú");
+	waddwstr(direction[static_cast<int>(Directions::up)], L"ï¿½ï¿½");
+	waddwstr(direction[static_cast<int>(Directions::down)], L"ï¿½ï¿½");
+	waddwstr(direction[static_cast<int>(Directions::left)], L"ï¿½ï¿½");
+	waddwstr(direction[static_cast<int>(Directions::right)], L"ï¿½ï¿½");
 	Directions selected = Directions::win;
 	for (auto i : { Directions::up , Directions::down, Directions::left, Directions::right })
 		if (!directionsEnable[static_cast<int>(i)]) wbkgd(direction[static_cast<int>(i)], COLOR_INVALID);
@@ -662,31 +708,31 @@ void Game::drawMain()
 	refresh();
 }
 
-bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
+template<typename Callback>
+bool _isAround(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, Callback _callback) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
 	auto x = playerPosition.first, y = playerPosition.second;
 	auto flag = false;
 	for (auto direction : directionTable) {
 		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
-			pf(x + direction[0], y + direction[1], flag);
-
+			_callback(x + direction[0], y + direction[1], flag);
 		}
 	}
 	return flag;
 }
 
 bool Game::isAround(ObjectType target) {
-	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
-	});
+		});
 }
 
 bool Game::canControlAround()
 {
-	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == ObjectType::creature) {
 			auto creature = globalMap->getLocationCreature(x, y);
 			auto monster = dynamic_cast<Monster*>(creature);
@@ -694,7 +740,7 @@ bool Game::canControlAround()
 				flag = true;
 			}
 		}
-	});
+		});
 }
 
 void Game::addInfo(const char* message)
@@ -865,4 +911,24 @@ void Game::printHelp()
 	addInfo("Helps:");
 	addInfo("w/a/s/d --Move player");
 	addInfo("m       --Show/Hide menu");
+}
+
+void Game::investigate() {
+	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
+	auto playerPosition = player->position;
+	auto x = playerPosition.first, y = playerPosition.second;
+	auto flag = false;
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				gameObject* toInvestigate;
+				if (objectType == ObjectType::creature)
+					toInvestigate = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+				else
+					toInvestigate = globalMap->getLocationItem(x + direction[0], y + direction[1]);
+				addInfo("Investigate result:");
+				addInfo(toInvestigate->getInfo().c_str());
+			}
+		}
+	}
 }

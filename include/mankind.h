@@ -22,7 +22,8 @@ public:
 	Mankind(std::pair<int, int> position,const char* name, Role role, attitudes attitude);
 	bool conjure(Monster* object);
 	bool attack(Creature& beAttack) override;
-	const char* getInfo() override;
+	CreatureType getCreatureType() override;
+	std::string getInfo() override;
 	void interactiveThis() override {};
 	int getAttack() override;
 	int getDefense() override;

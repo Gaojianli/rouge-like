@@ -11,7 +11,7 @@
 
 enum class MenuType
 {
-	Investigation = 0,
+	Investigate = 0,
 	Attack,
 	Control,
 	PickUp,
@@ -25,7 +25,6 @@ enum class MenuType
 class Game
 {
 private:
-	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
 	WINDOW *menubar, *map, *info, *status, *playerWin, **backpackWin, *playerStatusWin;
 	std::wstring infoList[17];
@@ -45,8 +44,10 @@ private:
 	bool canControlAround();
 	void nextRound();
 	void printHelp();
+	void investigate();
 public:
 	std::shared_ptr<Map> globalMap;
+	std::list<Creature*> characters;
 	std::shared_ptr<MainMap> globalMainMap;
 	Game() = default;
 	void init(); //create player

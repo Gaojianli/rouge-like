@@ -3,6 +3,10 @@
 #include <vector>
 #include "gameObject.h"
 #include "item.h"
+enum class CreatureType {
+	human,
+	monster
+};
 enum class attitudes
 {
 	friendly,
@@ -28,6 +32,7 @@ public:
 	int bePoisoned;
 	ObjectType getType() override;
 	virtual void died();
+	virtual CreatureType getCreatureType() = 0;
 	virtual bool attack(Creature &beAttack);
 	void setPosition(unsigned x, unsigned y);
 	virtual int getAttack() = 0;  //return the sum of the attack points of this creature
