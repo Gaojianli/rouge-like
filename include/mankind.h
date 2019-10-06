@@ -23,7 +23,7 @@ public:
 	bool conjure(Monster* object);
 	bool attack(Creature& beAttack) override;
 	CreatureType getCreatureType() override;
-	const char* getInfo() override;
+	std::string getInfo() override;
 	void interactiveThis() override {};
 	int getAttack() override;
 	int getDefense() override;
