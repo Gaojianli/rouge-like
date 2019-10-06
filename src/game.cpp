@@ -253,6 +253,7 @@ inputName:
 			case MenuType::Investigate:
 				investigate();
 				break;
+			case MenuType::Control:
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
