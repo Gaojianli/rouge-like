@@ -23,8 +23,6 @@ std::wstring s2ws(const string& s) {
 	return result;
 }
 
-
-
 #define COLOR_NORMAL COLOR_PAIR(1)
 #define COLOR_SELECTED COLOR_PAIR(2)
 #define COLOR_INVALID COLOR_PAIR(3)
@@ -42,16 +40,14 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
-	std::pair<int, int> zeropair = std::make_pair(0, 0);
-	int bottlenum = (std::rand() % 8 + 16);
-	std::vector<gameObject*> item_to_distribute;
-	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
+	std::vector<gameObject*> itemToDistribute;
+	for (int i = 0; i < std::rand() % 8 + 16; i++) // Add bottle to item list
 	{
-		item_to_distribute.push_back(new Bottle());
+		itemToDistribute.push_back(new Bottle());
 	}
 	for (int j = 0; j < 5; j++) // Add keys to item list
 	{
-		item_to_distribute.push_back(new Key(static_cast<Directions>(j), 1));
+		itemToDistribute.push_back(new Key(static_cast<Directions>(j), 1));
 	}
 	for (int k = 0; k < 3; k++) // Add Monster to item list
 	{
@@ -59,41 +55,52 @@ void Game::init()
 		{
 		case 0:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 1:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 2:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 3:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 4:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		default:
 			break;
 		}
+		// Init Maps.
+		globalMainMap = std::make_shared<MainMap>(MainMap());
+		// Roll Map.
+		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+
+		// Send Items to Map
+
+		for (auto i : itemToDistribute) {
+			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+		}
+		/* // Test line
+		auto item = std::vector<gameObject*>{
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+		};
+		globalMap->distributeThings(item);
+		*/
 	}
-	// TODO
-	globalMap = std::make_shared<Map>(Map());
-	auto item = std::vector<gameObject*>{
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-	};
-	globalMap->distributeThings(item);
 }
 
 void Game::start()
@@ -279,6 +286,7 @@ void Game::drawPlayer()
 	wprintw(playerWin, "/\\");
 	wrefresh(playerWin);
 }
+
 /*
 	Investigation
 	Attack
@@ -322,6 +330,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 	wrefresh(items[0]);
 	return items;
 }
+
 MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 {
 	int key;
@@ -358,6 +367,7 @@ MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 		}
 	}
 }
+
 void Game::deleteMenu(WINDOW** items, int count)
 {
 	int i;
@@ -367,6 +377,7 @@ void Game::deleteMenu(WINDOW** items, int count)
 	touchwin(stdscr);
 	refresh();
 }
+
 void Game::drawMain()
 {
 	resize_term(34, 100);
@@ -385,6 +396,7 @@ void Game::drawMain()
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
 }
+
 bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
@@ -398,6 +410,7 @@ bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, s
 	}
 	return flag;
 }
+
 bool Game::isAround(ObjectType target) {
 	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == target) {
@@ -405,6 +418,7 @@ bool Game::isAround(ObjectType target) {
 		}
 	});
 }
+
 bool Game::canControlAround()
 {
 	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
@@ -417,6 +431,7 @@ bool Game::canControlAround()
 		}
 	});
 }
+
 void Game::addInfo(const char* message)
 {
 	auto messageStr = string(message);
@@ -457,7 +472,6 @@ void Game::addInfo(const wchar_t* message)
 	wrefresh(info);
 }
 
-
 void Game::drawMap()
 {
 	auto mapStr = globalMap->drawablemap();
@@ -489,9 +503,18 @@ void Game::drawMap()
 	}
 	wrefresh(map);
 }
+
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
+
+	//regenerate balltes
+	auto item = std::vector<gameObject*>{
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+	};
+	globalMap->distributeThings(item);
+
 	for (auto& charac : characters)
 	{
 		for (int i = 4; i > 0; i--)
@@ -522,8 +545,8 @@ void Game::nextRound()
 			{
 				//temp function to calculate distance
 				auto calDistance = [](std::pair<int, int> postionA, std::pair<int, int> postionB) {
-					auto sumX = powf(postionA.first - postionB.first, 2);
-					auto sumY = powf(postionA.second - postionB.second, 2);
+					auto sumX = powf(float(postionA.first - postionB.first), float(2.0));
+					auto sumY = powf(float(postionA.second - postionB.second), float(2.0));
 					return sqrt(sumX + sumY);
 				};
 				for (int i = 4; i > 0; i--)

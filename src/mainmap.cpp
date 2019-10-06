@@ -41,7 +41,9 @@ MainMap::MainMap()
 			{
 				oneMap.setDisabledGate(0);
 			}
+			thisLine.push_back(oneMap);
 		}
+		maps.push_back(thisLine);
 	}
 }
 bool MainMap::SetMapLocation(int x, int y)

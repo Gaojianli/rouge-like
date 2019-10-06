@@ -5,7 +5,7 @@
 #include "monster.h"
 enum class BottleType
 {
-	bloodBottle,
+	bloodBottle=0,
 	manaBottle,
 	poison
 };

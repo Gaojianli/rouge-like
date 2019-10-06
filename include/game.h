@@ -42,6 +42,7 @@ private:
 	void nextRound();
 public:
 	std::shared_ptr<Map> globalMap;
+	std::shared_ptr<MainMap> globalMainMap;
 	Game() = default;
 	void init(); //create player
 	void start();
