@@ -623,6 +623,18 @@ int Game::scrollBackpack()
 		}
 	}
 }
+void Game::useOrThrowBackpack(int backpackIndex)
+{
+	auto item = new WINDOW * [3];
+	item[0] = newwin(7, 4, 3, 38);
+	wborder(item[0], '|', '|', '-', '-', '+', '+', '+', '+');
+	item[1] = subwin(item[0], 1, 5, 4, 39);
+	item[2] = subwin(item[0], 1, 5, 5, 39);
+	waddstr(item[1], "Use");
+	waddstr(item[2], "Throw");
+
+	int selected = 0;
+}
 Directions Game::scrollDirections(bool* directionsEnable)
 {
 	auto directionsWin = newwin(5, 10, 3, 38);
@@ -792,25 +804,45 @@ void Game::drawMap()
 		wmove(map, i + 1, 1);
 		waddstr(map, mapStr[i].c_str());
 	}
-	if (gates[0])
+	if (gates[0]) // up
 	{
 		wmove(map, 0, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[1])
+	if (gates[1]) // down
 	{
 		wmove(map, 10, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[2])
+	if (gates[2]) // left
 	{
 		wmove(map, 5, 0);
 		waddstr(map, "n");
 	}
-	if (gates[3])
+	if (gates[3]) //right
 	{
 		wmove(map, 5, 19);
 		waddstr(map, "n");
+	}
+	auto portal = globalMap->getPortal();
+	if (portal > 0) {
+		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
+		if (x == 0 && y == 0) {
+			mvwaddstr(map, 5, 0, "X");
+			mvwaddstr(map, 10, 9, "X");
+		}
+		else if (x == 0 && y == 3) {
+			mvwaddstr(map, 0, 9, "X");
+			mvwaddstr(map, 5, 0, "X");
+		}
+		else if (x == 3 && y == 3) {
+			mvwaddstr(map, 0, 9, "X");
+			mvwaddstr(map, 5, 19, "X");
+		}
+		else {
+			mvwaddstr(map, 10, 9, "X");
+			mvwaddstr(map, 5, 19, "X");
+		}
 	}
 	wrefresh(map);
 }

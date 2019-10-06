@@ -39,6 +39,7 @@ private:
 	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);
 	int scrollBackpack();
 	Directions scrollDirections(bool* directionsEnable);
+	void useOrThrowBackpack(int backpackIndex);
 	void deleteMenu(WINDOW** items, int count);
 	bool isAround(ObjectType target);
 	bool canControlAround();
