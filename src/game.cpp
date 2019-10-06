@@ -908,6 +908,7 @@ void Game::printHelp()
 	addInfo("<>   --Items");
 	addInfo("n/nn --Doors");
 	addInfo("/\\   --Player");
+	addInfo("X    --Magic tunnel");
 	addInfo(" ");
 	addInfo("Helps:");
 	addInfo("w/a/s/d --Move player");
