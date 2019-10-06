@@ -3,10 +3,10 @@
 #include "map.h"
 MainMap::MainMap()
 {
-	for (int i = 0; i < MAP_SIZE; i++)
+	for (int i = 0; i < mapSize; i++)
 	{
 		std::vector<Map> thisLine;
-		for (int j = 0; j < MAP_SIZE; j++) // i for x, j for y
+		for (int j = 0; j < mapSize; j++) // i for x, j for y
 		{
 			Map oneMap;
 			if (0 == i)
@@ -16,15 +16,15 @@ MainMap::MainMap()
 				{
 					oneMap.setPortal(3);
 				}
-				else if ((MAP_SIZE - 1) == j)
+				else if ((mapSize - 1) == j)
 				{
 					oneMap.setPortal(1);
 				}
 			}
-			else if ((MAP_SIZE - 1) == i)
+			else if ((mapSize - 1) == i)
 			{
 				oneMap.setDisabledGate(3);
-				if ((MAP_SIZE - 1) == j)
+				if ((mapSize - 1) == j)
 				{
 					oneMap.setPortal(2);
 				}
@@ -37,7 +37,7 @@ MainMap::MainMap()
 			{
 				oneMap.setDisabledGate(1);
 			}
-			if ((MAP_SIZE - 1) == j)
+			if ((mapSize - 1) == j)
 			{
 				oneMap.setDisabledGate(0);
 			}
@@ -48,7 +48,7 @@ MainMap::MainMap()
 }
 bool MainMap::SetMapLocation(int x, int y)
 {
-	if ((x < 0) || (x >= MAP_SIZE) || (y < 0) || (y >= MAP_SIZE))
+	if ((x < 0) || (x >= mapSize) || (y < 0) || (y >= mapSize))
 	{
 		return false;
 	}
@@ -69,12 +69,12 @@ int MainMap::GetMapYLocation()
 }
 bool isOutOfRange(int x, int y)
 {
-	if ((x < 0) || (x >= MAP_SIZE) || (y < 0) || (y >= MAP_SIZE))
+	if ((x < 0) || (x >= mapSize) || (y < 0) || (y >= mapSize))
 	{
-		return false;
+		return true;
 	}
 	else
 	{
-		return true;
+		return false;
 	}
 }

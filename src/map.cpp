@@ -47,18 +47,22 @@ void Map::setDisabledGate(int disabled_gate)
 	case 0:
 	{
 		enable_gate[0] = false;
+		break;
 	}
 	case 1:
 	{
 		enable_gate[1] = false;
+		break;
 	}
 	case 2:
 	{
 		enable_gate[2] = false;
+		break;
 	}
 	case 3:
 	{
 		enable_gate[3] = false;
+		break;
 	}
 	default:
 		break;

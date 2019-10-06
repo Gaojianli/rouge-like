@@ -1,7 +1,7 @@
 //MainMap.h
 
 #pragma once
-#define MAP_SIZE 4
+constexpr int mapSize = 4;
 #include <iostream>
 #include <vector>
 #include <string>
