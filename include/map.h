@@ -19,6 +19,7 @@ public:
 	int getPortal(); // Get portal_stat
 	std::vector<gameObject*>& getSameRoomObjectList(); //return objectlist in same room
 	void distributeThings(const std::vector<gameObject*>& items); // Automatically distribute objects on the map
+	void randomSetThings(gameObject* item);
 	void eraseGameObjectAt(int x, int y); // Erase object on certain location of the map
 	std::vector<std::string> drawablemap(); // Generate map for ui
 	void setGameObjectat(int x, int y, gameObject* gameobj); // Set a game oject at certain location
