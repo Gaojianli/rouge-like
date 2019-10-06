@@ -8,7 +8,6 @@
 #include <cmath>
 #include <functional>
 #include <comutil.h>  
-#pragma comment(lib, "comsuppw.lib") 
 using std::string;
 string ws2s(const std::wstring& ws) {
 	_bstr_t t = ws.c_str();
