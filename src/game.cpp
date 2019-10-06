@@ -3,6 +3,7 @@
 #include "monster.h"
 #include "mankind.h"
 #include "mainmap.h"
+#include "weapons.h"
 #include "key.h"
 #include "curses/curses.h"
 #include <cmath>
@@ -48,33 +49,53 @@ void Game::init()
 	{
 		itemToDistribute.push_back(new Key(static_cast<Directions>(j), 1));
 	}
-	for (int k = 0; k < 3; k++) // Add Monster to item list
+	for (int k = 0; k < 12; k++) // Add sword to item list
+	{
+		switch (std::rand() % 3)
+		{
+		case 0: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::sword, std::rand() % 5 + 5, 0, 0));
+			break;
+		}
+		case 1: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::shield, 0, std::rand() % 3 + 5, 0));
+			break;
+		}
+		case 2: {
+			itemToDistribute.push_back(new Weapons(WeaponsType::cane, std::rand() % 3 + 3, 0, std::rand() % 20 + 20));
+			break;
+		}
+		default:
+			break;
+		}
+	}
+	for (int l = 0; l < 3; l++) // Add Monster to item list
 	{
 		switch (std::rand() % 5)
 		{
 		case 0:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 1:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 2:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 3:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 4:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		default:

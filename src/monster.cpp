@@ -30,3 +30,6 @@ int Monster::getDefense()
 {
 	return this->power;
 }
+CreatureType Monster::getCreatureType() {
+	return CreatureType::monster;
+}

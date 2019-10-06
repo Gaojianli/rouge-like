@@ -3,6 +3,7 @@
 #include <string>
 #include <algorithm>
 #include "gameObject.h"
+#include "creature.h"
 
 Map::Map()
 {
@@ -140,7 +141,14 @@ std::vector<std::string> Map::drawablemap()
 			}
 			else if (ObjectType::creature == j->getType())
 			{
-				thisLine += "()";
+				Creature * m = static_cast<Creature*>(j);
+				if (CreatureType::monster == m->getCreatureType()) {
+					thisLine += "{}";
+				}
+				else {
+					thisLine += "()";
+				}
+
 			}
 			else if (ObjectType::item == j->getType())
 			{

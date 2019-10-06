@@ -134,3 +134,6 @@ bool Mankind::pick(Item &toPick)
 	else
 		return false;
 }
+CreatureType Mankind::getCreatureType() {
+	return CreatureType::human;
+}

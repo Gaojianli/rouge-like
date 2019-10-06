@@ -18,5 +18,6 @@ public:
 	MonsterType type;
 	int getAttack() override;
 	int getDefense() override;
+	CreatureType getCreatureType() override;
 	const char *getInfo() override;
 };
