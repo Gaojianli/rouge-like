@@ -103,6 +103,7 @@ void Game::start()
 	drawMain();
 	drawMap();
 	WINDOW** menu = nullptr;
+	bool menuEnable[7] = { false };
 	MenuType menuChoose = MenuType::Attack;
 	while (true) {
 		ch = getch();
@@ -110,6 +111,7 @@ void Game::start()
 		{
 		case 'M':
 		case 'm':
+			menuEnable[static_cast<int>(MenuType::Investigation)] = 
 			menu = drawMenu();
 			menuChoose = scrollMenu(menu, 7);
 			deleteMenu(menu,8);
@@ -185,6 +187,9 @@ MenuType Game::scrollMenu(WINDOW** items, int count)
 		else if (key == 13) {
 			return MenuType(selected);
 		}
+		else {
+			return MenuType::Close;
+		}
 	}
 }
 void Game::deleteMenu(WINDOW** items, int count) {
@@ -212,7 +217,23 @@ void Game::drawMain() {
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
 }
-
+bool Game::canInvestigation()
+{
+	auto playerPosition = player->position;
+	return false;
+}
+bool Game::canAttack()
+{
+	return false;
+}
+bool Game::canPickUp()
+{
+	return false;
+}
+bool Game::canControl()
+{
+	return false;
+}
 void Game::addInfo(const char* message)
 {
 	auto messageStr = string(message);

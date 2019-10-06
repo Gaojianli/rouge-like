@@ -15,7 +15,8 @@ enum class MenuType
 	Control,
 	Backpack,
 	Help,
-	Exit
+	Exit,
+	Close
 };
 
 class Game {
@@ -34,6 +35,10 @@ public:
 	void drawMain();
 	WINDOW** drawMenu();
 	MenuType scrollMenu(WINDOW** items, int count);
+	bool canInvestigation();
+	bool canAttack();
+	bool canPickUp();
+	bool canControl();
 	void deleteMenu(WINDOW** items, int count);
 	void nextRound();
 	void addInfo(const char* message);
