@@ -75,31 +75,47 @@ void Game::init()
 		{
 		case 0:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			Monster * m = new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 1:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 2:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 3:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 4:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		default:
 			break;
+		}
+		for (int m = 0; m < 3; m++) // Generate three human enemy
+		{
+			Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(p);
+			characters.push_back(p);
 		}
 		// Init Maps.
 		globalMainMap = std::make_shared<MainMap>(MainMap());
