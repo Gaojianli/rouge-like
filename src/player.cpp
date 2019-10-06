@@ -27,6 +27,9 @@ bool Player::move(MoveDirection direction)
 		break;
 	}
 	auto gates = game->globalMap->getGates();
+	if (movePoints == 0) {//can't move again this round
+		return false;
+	}
 	if (newX > 8 || newX < 0)
 	{ //detect door
 		if (newY == 4)
@@ -34,6 +37,7 @@ bool Player::move(MoveDirection direction)
 			if (gates[newX > 8 ? 2 : 3])
 			{
 				position = {newX > 8 ? 0 : 8, newY}; //new position in new door
+				movePoints--;
 				return true;
 			}
 		}
@@ -46,6 +50,7 @@ bool Player::move(MoveDirection direction)
 			if (gates[newY > 8 ? 0 : 1])
 			{
 				position = {newX, newY > 8 ? 0 : 8};
+				movePoints--;
 				return true;
 			}
 		}
@@ -58,6 +63,7 @@ bool Player::move(MoveDirection direction)
 	else
 	{
 		position = {newX, newY};
+		movePoints--;
 		return true;
 	}
 }
