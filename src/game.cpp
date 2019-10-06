@@ -86,13 +86,25 @@ void Game::init()
 			break;
 		}
 	}
-	globalMap = std::make_shared<Map>(Map());
+	// Init Maps.
+	globalMainMap = std::make_shared<MainMap>(MainMap());
+	// Roll Map.
+	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+	globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap);
+
+	// Send Items to Map
+
+	for (auto i : item_to_distribute) {
+		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+	}
+	/* // Test line
 	auto item = std::vector<gameObject*>{
 		new Bottle(BottleType::bloodBottle, 10),
 		new Bottle(BottleType::bloodBottle, 10),
 		new Bottle(BottleType::bloodBottle, 10),
 	};
 	globalMap->distributeThings(item);
+	*/
 }
 
 void Game::start()
