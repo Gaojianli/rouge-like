@@ -253,6 +253,8 @@ inputName:
 				investigate();
 				break;
 			case MenuType::Control:
+				conjoure();
+				break;
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -933,4 +935,28 @@ void Game::investigate() {
 			}
 		}
 	}
+}
+
+void Game::conjoure()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::creature) {
+					auto creatureObject= globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+					if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
+						if (direction[0] == 0) 
+							directions[direction[1] == 1 ? 0 : 1] = true;
+						else
+							directions[direction[0] == -1 ? 0 : 1] = true;
+					}
+				}
+			}
+		}
+	}
+	auto conjoureDirec = scrollDirections(directions);
+	player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
 }

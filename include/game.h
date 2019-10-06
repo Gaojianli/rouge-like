@@ -43,6 +43,7 @@ private:
 	bool isAround(ObjectType target);
 	bool canControlAround();
 	void nextRound();
+	void conjoure();
 	void printHelp();
 	void investigate();
 public:
