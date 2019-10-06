@@ -1,7 +1,7 @@
 //MainMap.h
 
 #pragma once
-constexpr int mapSize = 4;
+constexpr int mapSize = 4;//4 * 4=16 maps
 #include <iostream>
 #include <vector>
 #include <string>

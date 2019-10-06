@@ -271,6 +271,7 @@ inputName:
 				break;
 			case MenuType::NextRound:
 				nextRound();
+				drawMap();
 				break;
 			case MenuType::Help:
 				printHelp();
