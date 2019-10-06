@@ -40,7 +40,7 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
-	std::pair<int, int> zeropair = std::make_pair(0, 0);
+	std::pair<int, int> zeropair = { 0, 0 };
 	int bottlenum = (std::rand() % 8 + 16);
 	std::vector<gameObject*> item_to_distribute;
 	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
@@ -83,15 +83,26 @@ void Game::init()
 		default:
 			break;
 		}
+		// Init Maps.
+		globalMainMap = std::make_shared<MainMap>(MainMap());
+		// Roll Map.
+		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+
+		// Send Items to Map
+
+		for (auto i : item_to_distribute) {
+			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+		}
+		/* // Test line
+		auto item = std::vector<gameObject*>{
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+		};
+		globalMap->distributeThings(item);
+		*/
 	}
-	// TODO
-	globalMap = std::make_shared<Map>(Map());
-	auto item = std::vector<gameObject*>{
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-	};
-	globalMap->distributeThings(item);
 }
 
 void Game::start()
