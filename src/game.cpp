@@ -116,7 +116,10 @@ void Game::start()
 	echo();
 	auto name = new char[20];
 	flushinp(); //flush the input
+	inputName:
 	getnstr(name, 20);
+	if (strlen(name) == 0)
+		goto inputName;//reinput
 	move(LINES / 2 - 2, 0);
 	clrtoeol();
 	noecho();
