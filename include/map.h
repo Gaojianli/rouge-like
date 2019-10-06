@@ -20,7 +20,11 @@ public:
 	std::vector<gameObject*>& getSameRoomObjectList(); //return objectlist in same room
 	void distributeThings(const std::vector<gameObject*>& items); // Automatically distribute objects on the map
 	void randomSetThings(gameObject* item);
-	void eraseGameObjectAt(int x, int y); // Erase object on certain location of the map
+	void eraseGameObjectAt(int x, int y); // Erase object on certain location of the map, This will free the item!!!
+	void eraseGameObjectAt(int x, int y, bool freeMemory); // Erase object on certain location of the map, This will free the item!!!
+	gameObject* pickObjectAt(int x, int y); // Remove a gameobject from location and return it.
+	Item* pickItemAt(int x, int y); // Same to above, but do nothing when it's not an item and return nullptr
+	void moveObject(int src_x, int src_y, int dst_x, int dst_y); // Move src to dst , if dst have things, silently fail
 	std::vector<std::string> drawablemap(); // Generate map for ui
 	void setGameObjectat(int x, int y, gameObject* gameobj); // Set a game oject at certain location
 	bool isOutOfRange(int x, int y); // Judge if a location is out of map

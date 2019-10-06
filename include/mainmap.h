@@ -27,6 +27,6 @@ public:
 		return ((maps[y])[x]);
 	}
 	Map& GetCurrentMap() {
-		return GetMapAt(mainmap_y, mainmap_x);
+		return GetMapAt(mainmap_x, mainmap_y);
 	}
 };

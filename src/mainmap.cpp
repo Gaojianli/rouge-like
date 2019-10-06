@@ -37,7 +37,7 @@ MainMap::MainMap()
 			{
 				oneMap.setDisabledGate(2);
 			}
-			if ((mapSize - 1) == j)
+			else if ((mapSize - 1) == j)
 			{
 				oneMap.setDisabledGate(3);
 			}
@@ -45,7 +45,6 @@ MainMap::MainMap()
 		}
 		maps.push_back(thisLine);
 	}
-	std::reverse(maps.begin(), maps.end());
 }
 bool MainMap::SetMapLocation(int x, int y)
 {

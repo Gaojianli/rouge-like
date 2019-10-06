@@ -12,7 +12,7 @@ ObjectType Creature::getType()
 
 void Creature::died()
 {
-	game->globalMap->eraseGameObjectAt(position.first, position.second);
+	game->globalMap->eraseGameObjectAt(position.first, position.second, false);
 	game->characters.remove(this);
 	delete this;
 }
@@ -62,6 +62,9 @@ bool Creature::move(MoveDirection direction)
 	if (game->globalMap->isOutOfRange(newX, newY))
 	{
 		return false; //out of range
+	}
+	if (game->globalMap->getLocationType(newX, newY) != ObjectType::nothing) {
+		return false; // on other things
 	}
 	else
 	{
