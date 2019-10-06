@@ -52,6 +52,7 @@ bool Mankind::conjure(Monster *object)
 	{ //enough mana
 		this->mana -= object->power;
 		object->beControlled = 5; //control 5 rounds
+		follower.push_back(object);
 		return true;
 	}
 	else

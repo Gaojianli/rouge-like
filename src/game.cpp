@@ -871,10 +871,13 @@ void Game::nextRound()
 				};
 				for (int i = 4; i > 0; i--)
 				{
+					auto oldPostion = creatureObj->position;
 					if (!creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
 						i++; //move failed, try again;
-					else
-						globalMap->setGameObjectat(creatureObj->position.first, creatureObj->position.second, creatureObj);
+					else {
+						globalMap->moveObject(oldPostion.first, oldPostion.second, creatureObj->position.first, creatureObj->position.second);
+					}
+
 				}
 				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true)
 				{ //attack randomly
@@ -956,9 +959,8 @@ void Game::conjoure()
 		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
 			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
 				if (objectType == ObjectType::creature) {
-					auto creatureObject= globalMap->getLocationCreature(x + direction[0], y + direction[1]);
-					if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
-						if (direction[0] == 0) 
+					if (auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1])); monsterObj != nullptr) {
+						if (direction[0] == 0)
 							directions[direction[1] == 1 ? 0 : 1] = true;
 						else
 							directions[direction[0] == -1 ? 0 : 1] = true;
@@ -968,7 +970,9 @@ void Game::conjoure()
 		}
 	}
 	auto conjoureDirec = scrollDirections(directions);
-	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
-	if (status)
-		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
+	if (conjoureDirec != Directions::win) {
+		auto status = player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+		if (status)
+			globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
+	}
 }
