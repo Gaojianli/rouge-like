@@ -1,3 +1,4 @@
+#pragma once
 #include <list>
 #include <memory>
 #include <iostream>
@@ -6,6 +7,7 @@
 #include "map.h"
 #include "mainmap.h"
 #include "player.h"
+#include "key.h"
 
 enum class MenuType
 {
@@ -36,6 +38,8 @@ private:
 	void drawPlayer();
 	WINDOW** drawMenu(bool* menuEnable);
 	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);
+	int scrollBackpack();
+	Directions scrollDirections(bool* directionsEnable);
 	void deleteMenu(WINDOW** items, int count);
 	bool isAround(ObjectType target);
 	bool canControlAround();

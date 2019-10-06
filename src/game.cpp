@@ -3,11 +3,11 @@
 #include "monster.h"
 #include "mankind.h"
 #include "mainmap.h"
-#include "key.h"
+#include "weapons.h"
 #include "curses/curses.h"
 #include <cmath>
 #include <functional>
-#include <comutil.h>  
+#include <comutil.h>
 using std::string;
 string ws2s(const std::wstring& ws) {
 	_bstr_t t = ws.c_str();
@@ -201,6 +201,7 @@ inputName:
 		drawBackPack();
 		moveStatus = false;
 		auto oldPosition = player->position;
+		int backpackScroll = -1;
 		ch = getch();
 		switch (ch)
 		{
@@ -213,6 +214,13 @@ inputName:
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
+			case MenuType::Backpack:
+				drawBackPack();
+				backpackScroll = scrollBackpack();
+				break;
+			case MenuType::PickUp:
+
+				break;
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -285,7 +293,102 @@ inputName:
 
 	}
 }
-
+void showItemInWin(WINDOW* win, Item* item) {
+	if (item == nullptr) {
+		mvwaddstr(win, 0, 0, "       ");
+		mvwaddstr(win, 1, 0, " Empty ");
+		mvwaddstr(win, 2, 0, "       ");
+		mvwaddstr(win, 3, 0, "       ");
+		return;
+	}
+	switch (item->getItemType())
+	{
+	case ItemType::bottle:
+		switch (dynamic_cast<Bottle*>(item)->type)
+		{
+		case BottleType::bloodBottle:
+			mvwaddstr(win, 0, 0, "Blood  ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "HP: %d", dynamic_cast<Bottle*>(item)->increased);
+		case BottleType::manaBottle:
+			mvwaddstr(win, 0, 0, "Mana   ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "MP: %d", dynamic_cast<Bottle*>(item)->increased);
+		case BottleType::poison:
+			mvwaddstr(win, 0, 0, "Poison ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "R: %d", dynamic_cast<Bottle*>(item)->increased);
+		default:
+			break;
+		}
+		break;
+	case ItemType::key:
+		switch (dynamic_cast<Key*>(item)->direction)
+		{
+		case Directions::up:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, "   up  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::down:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " down  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::left:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " left  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::right:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " right ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::win:
+			mvwaddstr(win, 0, 0, "       ");
+			mvwaddstr(win, 1, 0, "Key to ");
+			mvwaddstr(win, 2, 0, "  WIN  ");
+			mvwaddstr(win, 3, 0, "       ");
+			break;
+		default:
+			break;
+		}
+		break;
+	case ItemType::weapons:
+		switch (dynamic_cast<Weapons*>(item)->type)
+		{
+		case WeaponsType::cane:
+			mvwaddstr(win, 0, 0, "  Cane ");
+			break;
+		case WeaponsType::shield:
+			mvwaddstr(win, 0, 0, "Shield ");
+			break;
+		case WeaponsType::sword:
+			mvwaddstr(win, 0, 0, " Sword ");
+			break;
+		default:
+			break;
+		}
+		mvwprintw(win, 1, 0, "ATK:%d", dynamic_cast<Weapons*>(item)->attack);
+		mvwprintw(win, 2, 0, "DEF:%d", dynamic_cast<Weapons*>(item)->defense);
+		mvwprintw(win, 3, 0, "MP :%d", dynamic_cast<Weapons*>(item)->mana);
+		break;
+	default:
+		break;
+	}
+}
+/*
+	1 2
+	3 4
+*/
 void Game::drawBackPack()
 {
 	if (backpackWin != nullptr) {
@@ -304,22 +407,10 @@ void Game::drawBackPack()
 	backpackWin[7] = subwin(backpackWin[3], 4, 7, 8, 66);
 	backpackWin[8] = subwin(backpackWin[4], 4, 7, 8, 74);
 	for (auto i : { 1,2,3,4 }) wborder(backpackWin[i], '|', '|', '-', '-', '+', '+', '+', '+');
-	
+	int count = 0;
+	for (auto i : player->backpack) showItemInWin(backpackWin[5 + (count++)], &i);
+	for (; count < 4; count++) showItemInWin(backpackWin[5 + count], nullptr);
 	wrefresh(backpackWin[0]);
-}
-void showItemInWin(WINDOW *win, Item &item) {
-	switch (item.getItemType())
-	{
-	case ItemType::bottle:
-		mvwaddstr(win, 0, 0,"");
-		break;
-	case ItemType::key:
-		break;
-	case ItemType::weapons:
-		break;
-	default:
-		break;
-	}
 }
 /*
 	name: name
@@ -446,7 +537,102 @@ MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 		}
 	}
 }
-
+int Game::scrollBackpack()
+{
+	int key;
+	int selected = 0;
+	int count = player->backpack.size();
+	wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
+	while (1)
+	{
+		key = getch();
+		if (key == KEY_DOWN || key == KEY_UP || key == KEY_LEFT || key == KEY_RIGHT)
+		{
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			wnoutrefresh(backpackWin[selected + 5]);
+			if (key == KEY_DOWN || key == KEY_UP)
+			{
+				selected = (selected + 2) % 4 < count ? (selected + 2) % 4 : selected;
+			}
+			else if (key == KEY_LEFT)
+			{
+				selected = (selected + 3) % 4 < count ? (selected + 3) % 4 : selected;
+			}
+			else
+			{
+				selected = (selected + 1) % 4 < count ? (selected + 1) % 4 : selected;
+			}
+			wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
+			wnoutrefresh(backpackWin[selected + 5]);
+			doupdate();
+		}
+		else if (key == 13)
+		{
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			return selected;
+		}
+		else {
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			return -1;
+		}
+	}
+}
+Directions Game::scrollDirections(bool* directionsEnable)
+{
+	auto directionsWin = newwin(5, 10, 3, 38);
+	auto direction = new WINDOW * [5];
+	wborder(directionsWin, '|', '|', '-', '-', '+', '+', '+', '+');
+	direction[static_cast<int>(Directions::up)] = subwin(directionsWin, 1, 2, 4, 42);
+	direction[static_cast<int>(Directions::down)] = subwin(directionsWin, 1, 2, 6, 42);
+	direction[static_cast<int>(Directions::left)] = subwin(directionsWin, 1, 2, 5, 40);
+	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
+	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
+	
+	waddwstr(direction[static_cast<int>(Directions::up)], L"¡ü");
+	waddwstr(direction[static_cast<int>(Directions::down)], L"¡ý");
+	waddwstr(direction[static_cast<int>(Directions::left)], L"¡û");
+	waddwstr(direction[static_cast<int>(Directions::right)], L"¡ú");
+	Directions selected = Directions::win;
+	for (auto i : { Directions::up , Directions::down, Directions::left, Directions::right })
+		if (!directionsEnable[static_cast<int>(i)]) wbkgd(direction[static_cast<int>(i)], COLOR_INVALID);
+	wbkgd(direction[static_cast<int>(Directions::win)], COLOR_SELECTED);
+	wrefresh(directionsWin);
+	int key;
+	while (true) {
+		key = getch();
+		if (key == KEY_DOWN || key == KEY_UP || key == KEY_LEFT || key == KEY_RIGHT)
+		{
+			wbkgd(direction[static_cast<int>(selected)], COLOR_NORMAL);
+			wnoutrefresh(direction[static_cast<int>(selected)]);
+			switch (key) {
+			case KEY_UP:
+				selected = directionsEnable[static_cast<int>(Directions::up)] ? Directions::up : selected;
+				break;
+			case KEY_DOWN:
+				selected = directionsEnable[static_cast<int>(Directions::down)] ? Directions::down : selected;
+				break;
+			case KEY_LEFT:
+				selected = directionsEnable[static_cast<int>(Directions::left)] ? Directions::left : selected;
+				break;
+			case KEY_RIGHT:
+				selected = directionsEnable[static_cast<int>(Directions::right)] ? Directions::right : selected;
+				break;
+			}
+			wbkgd(direction[static_cast<int>(selected)], COLOR_SELECTED);
+			wnoutrefresh(direction[static_cast<int>(selected)]);
+			doupdate();
+		}
+		else if (key == 13)
+		{
+			deleteMenu(direction, 5);
+			return selected;
+		}
+		else {
+			deleteMenu(direction, 5);
+			return Directions::win;
+		}
+	}
+}
 void Game::deleteMenu(WINDOW** items, int count)
 {
 	int i;
