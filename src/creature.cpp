@@ -63,6 +63,9 @@ bool Creature::move(MoveDirection direction)
 	{
 		return false; //out of range
 	}
+	if (game->globalMap->getLocationType(newX, newY) != ObjectType::nothing) {
+		return false; // on other things
+	}
 	else
 	{
 		position = {newX, newY};

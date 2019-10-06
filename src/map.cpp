@@ -113,7 +113,7 @@ void Map::randomSetThings(gameObject* item) {
 			if (ObjectType::creature == item->getType())
 			{
 				Creature* cret = static_cast<Creature*>(item);
-				cret->setPosition(rand_y, rand_x);
+				cret->setPosition(rand_x, rand_y);
 			}
 			break;
 		}
@@ -151,19 +151,12 @@ Item* Map::pickItemAt(int x, int y) {
 	}
 }
 void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
-	if (nullptr != (mapcontent[dst_y])[dst_x]) {
-		return;
-	}
-	else if(nullptr==(mapcontent[src_y])[src_x])
-	{
-		return;
-	}
-	else {
-		(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
-		(mapcontent[src_y])[src_x] = nullptr;
-		if (ObjectType::creature==(mapcontent[dst_y])[dst_x]->getType()) {
-			static_cast<Creature*>((mapcontent[dst_y])[dst_x])->setPosition(dst_x, dst_y);
-		}
+	if (nullptr != (mapcontent[dst_y])[dst_x]) return;
+	if(nullptr==(mapcontent[src_y])[src_x]) return;
+	(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
+	(mapcontent[src_y])[src_x] = nullptr;
+	if (ObjectType::creature==(mapcontent[dst_y])[dst_x]->getType()) {
+		static_cast<Creature*>((mapcontent[dst_y])[dst_x])->setPosition(dst_x, dst_y);
 	}
 }
 std::vector<std::string> Map::drawablemap()

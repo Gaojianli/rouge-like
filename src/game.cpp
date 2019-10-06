@@ -1099,7 +1099,7 @@ void Game::nextRound()
 					}
 				}
 				//NPC pick item
-				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr)
+				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr && mankindObj->backpack.size() <= 4)
 				{
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
