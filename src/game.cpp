@@ -183,12 +183,13 @@ inputName:
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({ 0, 0 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ rand()%9, rand()%9 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
 	refresh();
 	drawMain();
+	printHelp();
 	WINDOW** menu = nullptr;
 	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
