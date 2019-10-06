@@ -14,6 +14,7 @@ enum class MenuType
 	PickUp,
 	Control,
 	Backpack,
+	NextRound,
 	Help,
 	Exit,
 	Close

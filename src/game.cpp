@@ -42,7 +42,7 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
-	std::pair<int, int> zeropair = std::make_pair(0, 0);
+	std::pair<int, int> zeropair = { 0, 0 };
 	int bottlenum = (std::rand() % 8 + 16);
 	std::vector<gameObject*> item_to_distribute;
 	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
@@ -85,26 +85,26 @@ void Game::init()
 		default:
 			break;
 		}
-	}
-	// Init Maps.
-	globalMainMap = std::make_shared<MainMap>(MainMap());
-	// Roll Map.
-	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-	globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap);
+		// Init Maps.
+		globalMainMap = std::make_shared<MainMap>(MainMap());
+		// Roll Map.
+		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 
-	// Send Items to Map
+		// Send Items to Map
 
-	for (auto i : item_to_distribute) {
-		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+		for (auto i : item_to_distribute) {
+			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+		}
+		/* // Test line
+		auto item = std::vector<gameObject*>{
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+			new Bottle(BottleType::bloodBottle, 10),
+		};
+		globalMap->distributeThings(item);
+		*/
 	}
-	/* // Test line
-	auto item = std::vector<gameObject*>{
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-		new Bottle(BottleType::bloodBottle, 10),
-	};
-	globalMap->distributeThings(item);
-	*/
 }
 
 void Game::start()
@@ -189,14 +189,14 @@ void Game::start()
 	refresh();
 	drawMain();
 	WINDOW** menu = nullptr;
-	bool menuEnable[7] = { true,true,true,true,true,true,true };
-	MenuType menuChoose = MenuType::Attack;
-	bool moveStatus = false;
+	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
+	bool moveStatus = true;
 	while (true)
 	{
-		drawMap();
-		if (moveStatus)
+		if (moveStatus) {
+			drawMap();
 			drawPlayer();
+		}
 		moveStatus = false;
 		ch = getch();
 		switch (ch)
@@ -207,8 +207,15 @@ void Game::start()
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
 			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menu = drawMenu(menuEnable);
-			menuChoose = scrollMenu(menu, 7, menuEnable);
-			deleteMenu(menu, 8);
+			switch (scrollMenu(menu, 8, menuEnable))
+			{
+			case MenuType::NextRound:
+				nextRound();
+				break;
+			default:
+				break;
+			}
+			deleteMenu(menu, 9);
 			break;
 		case 'W': // move
 		case 'w':
@@ -229,6 +236,7 @@ void Game::start()
 		default:
 			break;
 		}
+
 	}
 }
 
@@ -244,7 +252,7 @@ void Game::drawPlayer()
 		refresh();
 	}
 	playerWin = subwin(map, 1, 2, 11 - player->position.second, 2 + player->position.first * 2);
-	wprintw(playerWin,"/\\");
+	wprintw(playerWin, "/\\");
 	wrefresh(playerWin);
 }
 /*
@@ -264,22 +272,23 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 		"Control",
 		"Pick up",
 		"Backpack",
+		"Next round",
 		"Help",
 		"Exit" };
 	int i;
-	WINDOW** items;
-	items = (WINDOW * *)malloc(8 * sizeof(WINDOW*));
+	WINDOW** items = new WINDOW * [9];
 
-	items[0] = newwin(9, 15, 3, 83);
+	items[0] = newwin(11, 16, 2, 22);
 	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
-	items[1] = subwin(items[0], 1, 13, 4, 84);
-	items[2] = subwin(items[0], 1, 13, 5, 84);
-	items[3] = subwin(items[0], 1, 13, 6, 84);
-	items[4] = subwin(items[0], 1, 13, 7, 84);
-	items[5] = subwin(items[0], 1, 13, 8, 84);
-	items[6] = subwin(items[0], 1, 13, 9, 84);
-	items[7] = subwin(items[0], 1, 13, 10, 84);
-	for (i = 0; i < 7; i++) {
+	items[1] = subwin(items[0], 1, 13, 3, 23);
+	items[2] = subwin(items[0], 1, 13, 4, 23);
+	items[3] = subwin(items[0], 1, 13, 5, 23);
+	items[4] = subwin(items[0], 1, 13, 6, 23);
+	items[5] = subwin(items[0], 1, 13, 7, 23);
+	items[6] = subwin(items[0], 1, 13, 8, 23);
+	items[7] = subwin(items[0], 1, 13, 9, 23);
+	items[8] = subwin(items[0], 1, 13, 10, 23);
+	for (i = 0; i < 8; i++) {
 		wprintw(items[i + 1], muneStr[i]);
 		if (!menuEnable[i]) wbkgd(items[i + 1], COLOR_INVALID);
 	}
@@ -330,7 +339,7 @@ void Game::deleteMenu(WINDOW** items, int count)
 	int i;
 	for (i = 0; i < count; i++)
 		delwin(items[i]);
-	free(items);
+	delete[] items;
 	touchwin(stdscr);
 	refresh();
 }
@@ -459,6 +468,14 @@ void Game::drawMap()
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
+
+	//regenerate balltes
+	auto item = std::vector<gameObject*>{
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+		new Bottle(static_cast<BottleType>(std::rand() % 3), 10),
+	};
+	globalMap->distributeThings(item);
+
 	for (auto& charac : characters)
 	{
 		for (int i = 4; i > 0; i--)
