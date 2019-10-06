@@ -12,7 +12,8 @@ std::string Monster::getInfo()
 	std::string introduction = "A ";
 	introduction += monsterTypes[(int)type];
 	introduction += ". Which power is " + std::to_string(this->power);
-	introduction += " . Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
+	introduction += ". Very ";
+	introduction += (attitude == attitudes::agressive) ? "agressive." : "friendly.";
 	return introduction;
 }
 

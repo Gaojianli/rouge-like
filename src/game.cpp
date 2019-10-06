@@ -111,9 +111,18 @@ void Game::init()
 			break;
 		}
 	}
+	const std::string roles[] = {
+		"magician",
+		"wizard",
+		"warrior",
+		"harpy",
+		"amazon",
+		"dwarf",
+		"monkey" };
 	for (int m = 0; m < 3; m++) // Generate three human NPC
 	{
-		Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
+		int role = std::rand() % 7;
+		Mankind* p = new Mankind({ 0, 0 }, (roles[role] + std::to_string(m)).c_str(), static_cast<Role>(role), static_cast<attitudes>(std::rand() % 2));
 		itemToDistribute.push_back(p);
 		characters.push_back(p);
 	}
