@@ -1,7 +1,11 @@
 #include "game.h"
 #include "bottle.h"
+#include "monster.h"
+#include "mankind.h"
 #include "mainmap.h"
+#include "key.h"
 #include "curses/curses.h"
+#include <cmath>
 using std::string;
 void Game::init()
 {
@@ -16,9 +20,50 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
+	std::pair<int, int> zeropair = std::make_pair(0, 0);
 	int bottlenum = (std::rand() % 8 + 16);
-	int keynum = 4;
-
+	std::vector<gameObject *> item_to_distribute;
+	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
+	{
+		item_to_distribute.push_back(new Bottle());
+	}
+	for (int j = 0; j < 5; j++) // Add keys to item list
+	{
+		item_to_distribute.push_back(new Key(static_cast<Directions>(j), 1));
+	}
+	for (int k = 0; k < 3; k++) // Add Monster to item list
+	{
+		switch (std::rand() % 5)
+		{
+		case 0:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 1:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 2:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 3:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		case 4:
+		{
+			item_to_distribute.push_back(new Monster(zeropair, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			break;
+		}
+		default:
+			break;
+		}
+	}
 	globalMap = std::make_shared<Map>(Map());
 }
 
@@ -31,10 +76,10 @@ void Game::start()
 	attrset(A_NORMAL);
 	mvprintw(LINES / 2 - 2, COLS / 2 - 27, "Please input your name:");
 	refresh();
-	curs_set(1);//show the curs
+	curs_set(1); //show the curs
 	echo();
 	auto name = new char[20];
-	flushinp();//flush the input
+	flushinp(); //flush the input
 	getnstr(name, 20);
 	move(LINES / 2 - 2, 0);
 	clrtoeol();
@@ -47,13 +92,14 @@ void Game::start()
 		"harpy",
 		"amazon",
 		"dwarf",
-		"monkey"
-	};
-	for (int i = 0; i < 7; i++) {
-		if (i == 0) {
+		"monkey"};
+	for (int i = 0; i < 7; i++)
+	{
+		if (i == 0)
+		{
 			string toInsert = "*";
 			toInsert += roles[i];
-			mvprintw(5 + i, COLS / 2 - 21, toInsert.c_str());//default select
+			mvprintw(5 + i, COLS / 2 - 21, toInsert.c_str()); //default select
 		}
 		else
 			mvprintw(5 + i, COLS / 2 - 20, roles[i].c_str());
@@ -63,7 +109,8 @@ void Game::start()
 	keypad(stdscr, TRUE);
 	bool selected = false;
 	curs_set(0);
-	while (!selected) {
+	while (!selected)
+	{
 		ch = getch();
 		string toInsert = "*";
 		switch (ch)
@@ -88,24 +135,25 @@ void Game::start()
 			mvprintw(5 + postion, COLS / 2 - 21, toInsert.c_str());
 			refresh();
 			break;
-		case 13://enter
+		case 13: //enter
 			selected = true;
 			break;
 		default:
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({ 0,0 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({0, 0}, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
 	refresh();
 	drawMain();
 	drawMap();
-	WINDOW** menu = nullptr;
+	WINDOW **menu = nullptr;
 	bool menuEnable[7] = { false };
 	MenuType menuChoose = MenuType::Attack;
-	while (true) {
+	while (true)
+	{
 		ch = getch();
 		switch (ch)
 		{
@@ -114,7 +162,7 @@ void Game::start()
 			menuEnable[static_cast<int>(MenuType::Investigation)] = 
 			menu = drawMenu();
 			menuChoose = scrollMenu(menu, 7);
-			deleteMenu(menu,8);
+			deleteMenu(menu, 8);
 		default:
 			break;
 		}
@@ -128,27 +176,20 @@ void Game::start()
 	Backpack
 	Help
 	Exit
-	调查(可选)
-	攻击(可选)
-	施法(可选)
-	捡拾(可选)
-	背包
-	帮助
-	退出
 */
-WINDOW** Game::drawMenu() {
-	const char* muneStr[]{
+WINDOW **Game::drawMenu()
+{
+	const char *muneStr[]{
 		"Investigation",
 		"Attack",
 		"Control",
 		"Pick up",
 		"Backpack",
 		"Help",
-		"Exit"
-	};
+		"Exit"};
 	int i;
-	WINDOW** items;
-	items = (WINDOW * *)malloc(8 * sizeof(WINDOW*));
+	WINDOW **items;
+	items = (WINDOW **)malloc(8 * sizeof(WINDOW *));
 
 	items[0] = newwin(9, 15, 3, 83);
 	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
@@ -160,31 +201,36 @@ WINDOW** Game::drawMenu() {
 	items[6] = subwin(items[0], 1, 13, 9, 84);
 	items[7] = subwin(items[0], 1, 13, 10, 84);
 	for (i = 0; i < 7; i++)
-		wprintw(items[i+1], muneStr[i]);
+		wprintw(items[i + 1], muneStr[i]);
 	wbkgd(items[1], COLOR_PAIR(2));
 	wrefresh(items[0]);
 	return items;
 }
-MenuType Game::scrollMenu(WINDOW** items, int count)
+MenuType Game::scrollMenu(WINDOW **items, int count)
 {
 	int key;
 	int selected = 0;
-	while (1) {
+	while (1)
+	{
 		key = getch();
-		if (key == KEY_DOWN || key == KEY_UP) {
+		if (key == KEY_DOWN || key == KEY_UP)
+		{
 			wbkgd(items[selected + 1], COLOR_PAIR(1));
 			wnoutrefresh(items[selected + 1]);
-			if (key == KEY_DOWN) {
+			if (key == KEY_DOWN)
+			{
 				selected = (selected + 1) % count;
 			}
-			else {
+			else
+			{
 				selected = (selected + count - 1) % count;
 			}
 			wbkgd(items[selected + 1], COLOR_PAIR(2));
 			wnoutrefresh(items[selected + 1]);
 			doupdate();
 		}
-		else if (key == 13) {
+		else if (key == 13)
+		{
 			return MenuType(selected);
 		}
 		else {
@@ -192,7 +238,8 @@ MenuType Game::scrollMenu(WINDOW** items, int count)
 		}
 	}
 }
-void Game::deleteMenu(WINDOW** items, int count) {
+void Game::deleteMenu(WINDOW **items, int count)
+{
 	int i;
 	for (i = 0; i < count; i++)
 		delwin(items[i]);
@@ -200,8 +247,9 @@ void Game::deleteMenu(WINDOW** items, int count) {
 	touchwin(stdscr);
 	refresh();
 }
-void Game::drawMain() {
-	resize_term(34,100);
+void Game::drawMain()
+{
+	resize_term(34, 100);
 	clrtobot();
 	//bkgd(COLOR_PAIR(1));
 	menubar = subwin(stdscr, 1, 100, 0, 0);
@@ -234,18 +282,20 @@ bool Game::canControl()
 {
 	return false;
 }
-void Game::addInfo(const char* message)
+void Game::addInfo(const char *message)
 {
 	auto messageStr = string(message);
 	while (messageStr.length() % 96 != 0)
 	{
 		messageStr += " ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i ++) {
+	for (int i = 0; i < messageStr.length() / 96; i++)
+	{
 		infoList[header++] = messageStr.substr(i * 96, 96);
 		header %= 17;
 	}
-	for (int i = 0; i < 17; i++) {
+	for (int i = 0; i < 17; i++)
+	{
 		wmove(info, i + 1, 1);
 		waddstr(info, infoList[(i + header) % 17].c_str());
 	}
@@ -254,31 +304,36 @@ void Game::addInfo(const char* message)
 
 void Game::drawMap()
 {
-	auto item = std::vector<gameObject*>{
-		new Bottle(BottleType::bloodBottle,10),
-		new Bottle(BottleType::bloodBottle,10),
-		new Bottle(BottleType::bloodBottle,10),
+	auto item = std::vector<gameObject *>{
+		new Bottle(BottleType::bloodBottle, 10),
+		new Bottle(BottleType::bloodBottle, 10),
+		new Bottle(BottleType::bloodBottle, 10),
 	};
 	globalMap->distributeThings(item);
 	auto mapStr = globalMap->drawablemap();
 	auto gates = globalMap->getGates();
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < 9; i++)
+	{
 		wmove(map, i + 1, 1);
 		waddstr(map, mapStr[i].c_str());
 	}
-	if (gates[0]) {
+	if (gates[0])
+	{
 		wmove(map, 0, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[1]) {
+	if (gates[1])
+	{
 		wmove(map, 10, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[2]) {
+	if (gates[2])
+	{
 		wmove(map, 5, 0);
 		waddstr(map, "n");
 	}
-	if (gates[3]) {
+	if (gates[3])
+	{
 		wmove(map, 5, 19);
 		waddstr(map, "n");
 	}
@@ -286,21 +341,77 @@ void Game::drawMap()
 }
 void Game::nextRound()
 {
-	for (auto& charac : characters) {
-		for (int i = 4; i > 0; i--) {
+	for (auto &charac : characters)
+	{
+		for (int i = 4; i > 0; i--)
+		{
 			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
-				i++;//move failed, try again;
+				i++; //move failed, try again;
 		}
-		if (charac->attitude == attitudes::agressive||charac->beAttacked==true) {//attack randomly
-			
+		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
+		{ //attack randomly
 		}
-		if (charac->bePoisoned > 0) {
-			charac->health -= charac->bePoisoned * 2;//health loss of ponison
+		if (charac->bePoisoned > 0)
+		{
+			charac->health -= charac->bePoisoned * 2; //health loss of ponison
 			charac->bePoisoned--;
 		}
-		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr) {
+		if (auto monsterChar = dynamic_cast<Monster *>(charac); monsterChar != nullptr)
+		{
 			//if it is monster, rest controlled rounds decrease
 			monsterChar->beControlled--;
+		}
+	}
+	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
+	for (auto &obj : sameRoomCharacters)
+	{
+		if (obj->getType() == ObjectType::creature)
+		{
+			if (auto creatureObj = dynamic_cast<Creature *>(obj); creatureObj->name != player->name)
+			{
+				//temp function to calculate distance
+				auto calDistance = [](std::pair<int, int> postionA, std::pair<int, int> postionB) {
+					auto sumX = powf(postionA.first - postionB.first, 2);
+					auto sumY = powf(postionA.second - postionB.second, 2);
+					return sqrt(sumX + sumY);
+				};
+				for (int i = 4; i > 0; i--)
+				{
+					if (creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
+						i++; //move failed, try again;
+				}
+				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true)
+				{ //attack randomly
+					if (calDistance(creatureObj->position, player->position) == 1)
+					{ //can attack player
+						creatureObj->attack(*player);
+					}
+				}
+				//NPC pick item
+				if (auto mankindObj = dynamic_cast<Mankind *>(creatureObj); mankindObj != nullptr)
+				{
+					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
+					{
+						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
+						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second);
+					}
+					else if (globalMap->getLocationType(creatureObj->position.first - 1, creatureObj->position.second) == ObjectType::item)
+					{
+						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
+						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second);
+					}
+					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second + 1) == ObjectType::item)
+					{
+						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1);
+					}
+					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second - 1) == ObjectType::item)
+					{
+						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1);
+					}
+				}
+			}
 		}
 	}
 }
