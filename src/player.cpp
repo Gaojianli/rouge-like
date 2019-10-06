@@ -68,7 +68,7 @@ bool Player::move(MoveDirection direction)
 	}
 }
 
-const char* Player::getInfo()
+std::string Player::getInfo()
 {
 	return "Player";
 }

@@ -19,6 +19,6 @@ public:
 	template <typename T>
 	bool use(T &target);
 	ItemType getItemType() override;
-	const char *getInfo() override;
+	std::string getInfo() override;
 	// void interactiveThis() override;
 };

@@ -8,3 +8,8 @@ ItemType Item::getItemType()
 {
 	return ItemType();
 }
+
+std::string Item::getInfo()
+{
+	return std::string("Item");
+}
