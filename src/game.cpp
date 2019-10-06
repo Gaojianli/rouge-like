@@ -40,16 +40,14 @@ void Game::init()
 	raw();
 	noecho();
 	// Generate items
-	std::pair<int, int> zeropair = { 0, 0 };
-	int bottlenum = (std::rand() % 8 + 16);
-	std::vector<gameObject*> item_to_distribute;
-	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
+	std::vector<gameObject*> itemToDistribute;
+	for (int i = 0; i < std::rand() % 8 + 16; i++) // Add bottle to item list
 	{
-		item_to_distribute.push_back(new Bottle());
+		itemToDistribute.push_back(new Bottle());
 	}
 	for (int j = 0; j < 5; j++) // Add keys to item list
 	{
-		item_to_distribute.push_back(new Key(static_cast<Directions>(j), 1));
+		itemToDistribute.push_back(new Key(static_cast<Directions>(j), 1));
 	}
 	for (int k = 0; k < 3; k++) // Add Monster to item list
 	{
@@ -57,27 +55,27 @@ void Game::init()
 		{
 		case 0:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(k)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 1:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(k)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 2:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(k)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 3:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(k)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		case 4:
 		{
-			item_to_distribute.push_back(new Monster(zeropair, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(k)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
 			break;
 		}
 		default:
@@ -91,7 +89,7 @@ void Game::init()
 
 		// Send Items to Map
 
-		for (auto i : item_to_distribute) {
+		for (auto i : itemToDistribute) {
 			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
 		}
 		/* // Test line
