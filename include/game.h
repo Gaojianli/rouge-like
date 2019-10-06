@@ -35,12 +35,10 @@ public:
 	void init(); //create player
 	void start();
 	void drawMain();
-	WINDOW **drawMenu();
-	MenuType scrollMenu(WINDOW **items, int count);
-	bool canInvestigation();
-	bool canAttack();
-	bool canPickUp();
-	bool canControl();
+	WINDOW **drawMenu(bool *menuEnable);
+	MenuType scrollMenu(WINDOW **items, int count, bool *menuEnable);
+	bool isAround(ObjectType target);
+	bool canControlAround();
 	void deleteMenu(WINDOW **items, int count);
 	void nextRound();
 	void addInfo(const char *message);

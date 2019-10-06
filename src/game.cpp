@@ -6,14 +6,20 @@
 #include "key.h"
 #include "curses/curses.h"
 #include <cmath>
+#include <functional>
+
+#define COLOR_NORMAL COLOR_PAIR(1)
+#define COLOR_SELECTED COLOR_PAIR(2)
+#define COLOR_INVALID COLOR_PAIR(3)
+
 using std::string;
 void Game::init()
 {
 	initscr();
 	start_color();
-	init_pair(1, COLOR_WHITE, COLOR_BLACK);
-	init_pair(2, COLOR_BLACK, COLOR_WHITE);
-	init_pair(3, COLOR_WHITE, COLOR_RED);
+	init_pair(1, COLOR_WHITE, COLOR_BLACK); // normal
+	init_pair(2, COLOR_BLACK, COLOR_WHITE); // selected
+	init_pair(3, COLOR_RED, COLOR_BLACK);   // invalid
 	init_pair(4, COLOR_WHITE, COLOR_GREEN);
 	init_pair(5, COLOR_WHITE, COLOR_YELLOW);
 	curs_set(0);
@@ -150,7 +156,7 @@ void Game::start()
 	drawMain();
 	drawMap();
 	WINDOW **menu = nullptr;
-	bool menuEnable[7] = { false };
+	bool menuEnable[7] = { true,true,true,true,true,true,true };
 	MenuType menuChoose = MenuType::Attack;
 	while (true)
 	{
@@ -159,9 +165,11 @@ void Game::start()
 		{
 		case 'M':
 		case 'm':
-			menuEnable[static_cast<int>(MenuType::Investigation)] = 
-			menu = drawMenu();
-			menuChoose = scrollMenu(menu, 7);
+			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
+			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
+			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menu = drawMenu(menuEnable);
+			menuChoose = scrollMenu(menu, 7, menuEnable);
 			deleteMenu(menu, 8);
 		default:
 			break;
@@ -177,7 +185,7 @@ void Game::start()
 	Help
 	Exit
 */
-WINDOW **Game::drawMenu()
+WINDOW **Game::drawMenu(bool *menuEnable)
 {
 	const char *muneStr[]{
 		"Investigation",
@@ -200,32 +208,40 @@ WINDOW **Game::drawMenu()
 	items[5] = subwin(items[0], 1, 13, 8, 84);
 	items[6] = subwin(items[0], 1, 13, 9, 84);
 	items[7] = subwin(items[0], 1, 13, 10, 84);
-	for (i = 0; i < 7; i++)
+	for (i = 0; i < 7; i++) {
 		wprintw(items[i + 1], muneStr[i]);
-	wbkgd(items[1], COLOR_PAIR(2));
+		if(!menuEnable[i]) wbkgd(items[i+1], COLOR_INVALID);
+	}
+	i = 0;
+	while (!menuEnable[i++]);
+	wbkgd(items[i], COLOR_SELECTED);
 	wrefresh(items[0]);
 	return items;
 }
-MenuType Game::scrollMenu(WINDOW **items, int count)
+MenuType Game::scrollMenu(WINDOW **items, int count, bool *menuEnable)
 {
 	int key;
 	int selected = 0;
+	while (!menuEnable[selected++]);
+	selected -= 1;
 	while (1)
 	{
 		key = getch();
 		if (key == KEY_DOWN || key == KEY_UP)
 		{
-			wbkgd(items[selected + 1], COLOR_PAIR(1));
+			wbkgd(items[selected + 1], COLOR_NORMAL);
 			wnoutrefresh(items[selected + 1]);
 			if (key == KEY_DOWN)
 			{
-				selected = (selected + 1) % count;
+				while (!menuEnable[(++selected) % count]);
 			}
 			else
 			{
-				selected = (selected + count - 1) % count;
+				selected += count;
+				while (!menuEnable[(--selected) % count]);
 			}
-			wbkgd(items[selected + 1], COLOR_PAIR(2));
+			selected %= count;
+			wbkgd(items[selected + 1], COLOR_SELECTED);
 			wnoutrefresh(items[selected + 1]);
 			doupdate();
 		}
@@ -265,22 +281,37 @@ void Game::drawMain()
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
 }
-bool Game::canInvestigation()
-{
+bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
+	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
-	return false;
+	auto x = playerPosition.first, y = playerPosition.second;
+	auto flag = false;
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			pf(x + direction[0], y + direction[1], flag);
+			
+		}
+	}
+	return flag;
 }
-bool Game::canAttack()
-{
-	return false;
+bool Game::isAround(ObjectType target) {
+	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+		if (globalMap->getLocationType(x, y) == target) {
+			flag = true;
+		}
+	});
 }
-bool Game::canPickUp()
+bool Game::canControlAround()
 {
-	return false;
-}
-bool Game::canControl()
-{
-	return false;
+	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+		if (globalMap->getLocationType(x, y) == ObjectType::creature) {
+			auto creature = globalMap->getLocationCreature(x, y);
+			auto monster = dynamic_cast<Monster*>(creature);
+			if (monster != nullptr && monster->beControlled == 0) {
+				flag = true;
+			}
+		}
+	});
 }
 void Game::addInfo(const char *message)
 {
