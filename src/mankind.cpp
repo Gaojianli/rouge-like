@@ -12,6 +12,11 @@ Mankind::Mankind(std::pair<int, int> position, const char *name, Role role, atti
 		this->mana = this->manaUpper = 514;
 		this->power = 9;
 		break;
+	case Role::wizard:
+		this->health = this->healthUpper = 140;
+		this->mana = this->manaUpper = 400;
+		this->power = 9;
+		break;
 	case Role::amazon:
 		this->health = this->healthUpper = 514;
 		this->mana = this->manaUpper = 0;
