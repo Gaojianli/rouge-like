@@ -389,6 +389,7 @@ void Game::drawMap()
 }
 void Game::nextRound()
 {
+	player->movePoints = 5;//reset move points
 	for (auto &charac : characters)
 	{
 		for (int i = 4; i > 0; i--)

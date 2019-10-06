@@ -1,7 +1,7 @@
 #include "player.h"
 #include "game.h"
 extern std::shared_ptr<Game> game;
-Player::Player(std::pair<int, int> postion, const char *name, Role role) : Mankind(postion, name, role, attitudes::agressive)
+Player::Player(std::pair<int, int> postion, const char* name, Role role) : Mankind(postion, name, role, attitudes::agressive)
 {
 }
 
@@ -27,13 +27,17 @@ bool Player::move(MoveDirection direction)
 		break;
 	}
 	auto gates = game->globalMap->getGates();
+	if (movePoints == 0) {//can't move again this round
+		return false;
+	}
 	if (newX > 8 || newX < 0)
 	{ //detect door
 		if (newY == 4)
 		{ //door
 			if (gates[newX > 8 ? 2 : 3])
 			{
-				position = {newX > 8 ? 0 : 8, newY}; //new position in new door
+				position = { newX > 8 ? 0 : 8, newY }; //new position in new door
+				movePoints--;
 				return true;
 			}
 		}
@@ -45,19 +49,26 @@ bool Player::move(MoveDirection direction)
 		{
 			if (gates[newY > 8 ? 0 : 1])
 			{
-				position = {newX, newY > 8 ? 0 : 8};
+				position = { newX, newY > 8 ? 0 : 8 };
+				movePoints--;
 				return true;
 			}
 		}
 		return false;
 	}
-	if (game->globalMap->isOutOfRange(newX, newY))
+	if (game->globalMap->isOutOfRange(newX, newY) || game->globalMap->getLocationType(newX, newY) != ObjectType::nothing)
 	{
 		return false; //out of range
 	}
 	else
 	{
-		position = {newX, newY};
+		position = { newX, newY };
+		movePoints--;
 		return true;
 	}
+}
+
+const char* Player::getInfo()
+{
+	return "Player";
 }
