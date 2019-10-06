@@ -29,6 +29,7 @@ private:
 	WINDOW *menubar, *map, *info, *status, *playerWin, **backpackWin, *playerStatusWin;
 	std::wstring infoList[17];
 	int header = 0;
+	bool wined = false;
 	MainMap mainmap;
 	void drawMain();
 	void drawMap();
@@ -39,12 +40,16 @@ private:
 	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);
 	int scrollBackpack();
 	Directions scrollDirections(bool* directionsEnable);
-	void useOrThrowBackpack(int backpackIndex);
+	bool useOrThrowBackpack(int backpackIndex);
+	void useItem(int backpackIndex);
+	void throwItem(int backpackIndex);
+	void gotoWin();
 	void deleteMenu(WINDOW** items, int count);
 	bool isAround(ObjectType target);
 	bool canControlAround();
 	void nextRound();
 	void conjoure();
+	void pickup();
 	void printHelp();
 	void investigate();
 public:

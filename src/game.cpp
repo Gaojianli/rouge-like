@@ -230,7 +230,7 @@ inputName:
 	WINDOW** menu = nullptr;
 	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
-	while (true)
+	while (!wined)
 	{
 		drawMap();
 		drawPlayer();
@@ -248,15 +248,17 @@ inputName:
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
 			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
 			menuEnable[static_cast<int>(MenuType::Investigate)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Backpack)] = !player->backpack.empty();
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
 			case MenuType::Backpack:
 				drawBackPack();
 				backpackScroll = scrollBackpack();
+				useOrThrowBackpack(backpackScroll);
 				break;
 			case MenuType::PickUp:
-
+				pickup();
 				break;
 			case MenuType::Investigate:
 				investigate();
@@ -266,7 +268,6 @@ inputName:
 				break;
 			case MenuType::NextRound:
 				nextRound();
-				drawMap();
 				break;
 			case MenuType::Help:
 				printHelp();
@@ -333,7 +334,6 @@ inputName:
 				}
 			}
 		}
-
 	}
 }
 void showItemInWin(WINDOW* win, Item* item) {
@@ -451,7 +451,7 @@ void Game::drawBackPack()
 	backpackWin[8] = subwin(backpackWin[4], 4, 7, 8, 74);
 	for (auto i : { 1,2,3,4 }) wborder(backpackWin[i], '|', '|', '-', '-', '+', '+', '+', '+');
 	int count = 0;
-	for (auto i : player->backpack) showItemInWin(backpackWin[5 + (count++)], &i);
+	for (auto i : player->backpack) showItemInWin(backpackWin[5 + (count++)], i);
 	for (; count < 4; count++) showItemInWin(backpackWin[5 + count], nullptr);
 	wrefresh(backpackWin[0]);
 }
@@ -600,6 +600,7 @@ int Game::scrollBackpack()
 	int selected = 0;
 	int count = player->backpack.size();
 	wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
+	wnoutrefresh(backpackWin[selected + 5]);
 	while (1)
 	{
 		key = getch();
@@ -634,17 +635,182 @@ int Game::scrollBackpack()
 		}
 	}
 }
-void Game::useOrThrowBackpack(int backpackIndex)
+bool Game::useOrThrowBackpack(int backpackIndex)
 {
 	auto item = new WINDOW * [3];
-	item[0] = newwin(7, 4, 3, 38);
+	item[0] = newwin(4, 7, 3, 38);
 	wborder(item[0], '|', '|', '-', '-', '+', '+', '+', '+');
 	item[1] = subwin(item[0], 1, 5, 4, 39);
 	item[2] = subwin(item[0], 1, 5, 5, 39);
 	waddstr(item[1], "Use");
 	waddstr(item[2], "Throw");
-
+	
+	wrefresh(item[0]);
 	int selected = 0;
+	bool canUse = true;
+	auto playerItem = player->backpack[backpackIndex];
+	if (\
+		playerItem->getItemType() == ItemType::weapons || \
+		(playerItem->getItemType() == ItemType::key && dynamic_cast<Key*>(playerItem)->used == false)\
+	)
+	{
+		wbkgd(item[1], COLOR_INVALID);
+		wnoutrefresh(item[1]);
+		canUse = false;
+		selected = 1;
+	}
+	else {
+		wbkgd(item[1], COLOR_SELECTED);
+		wnoutrefresh(item[1]);
+	}
+	int key;
+	while (true) {
+		key = getch();
+		switch (key)
+		{
+		case KEY_UP:
+		case KEY_DOWN:
+			wbkgd(item[selected + 1], COLOR_NORMAL);
+			wnoutrefresh(item[selected + 1]);
+			if (canUse) {
+				selected = (selected + 1) % 2;
+			}
+			wbkgd(item[selected + 1], COLOR_SELECTED);
+			wnoutrefresh(item[selected + 1]);
+			doupdate();
+			break;
+		case 13:
+			deleteMenu(item, 3);
+			if (selected == 0) {
+				useItem(backpackIndex);
+			}
+			else {
+				throwItem(backpackIndex);
+			}
+			drawBackPack();
+			return true;
+		default:
+			deleteMenu(item, 3);
+			return false;
+		}
+	}
+}
+void Game::throwItem(int backpackIndex)
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto item = player->backpack[backpackIndex];
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType == ObjectType::nothing) {
+				if (direction[0] == 0)
+					directions[direction[1] == 1 ? 0 : 1] = true;
+				else
+					directions[direction[0] == -1 ? 2 : 3] = true;
+			}
+		}
+	}
+	addInfo("If you want to throw something away, choose a direction.");
+	Directions selected;
+	if ((selected = scrollDirections(directions)) == Directions::win) {
+		addInfo("You choose to cancel.");
+		return;
+	}
+	auto direction = directionTable[static_cast<int>(selected)];
+	auto it = player->backpack.begin() + backpackIndex;
+	player->backpack.erase(it);
+	globalMap->setGameObjectat(x + direction[0], y + direction[1], item);
+	addInfo("You threw it on the ground.");
+}
+void Game::useItem(int backpackIndex)
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto item = player->backpack[backpackIndex];
+	if (item->getItemType() == ItemType::bottle) {
+		auto bottle = dynamic_cast<Bottle*>(item);
+		if (bottle->type == BottleType::bloodBottle) {
+			player->health = player->health + bottle->increased > player->healthUpper ? \
+				player->healthUpper : player->health + bottle->increased;
+			addInfo("Used blood bottle. HP up!");
+		}
+		else if (bottle->type == BottleType::manaBottle) {
+			player->mana = player->mana + bottle->increased > player->manaUpper ? \
+				player->manaUpper : player->mana + bottle->increased;
+			addInfo("Used mana bottle. MP up!");
+		}
+		else {
+			addInfo("If you want to use poison, select the direction first.");
+			Directions selected;
+			auto x = player->position.first, y = player->position.second;
+			bool directions[4] = { false };
+			for (auto direction : directionTable) {
+				if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+					if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+						if (objectType == ObjectType::creature) {
+							auto creatureObject = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+							if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
+								if (monsterObj->beControlled != 0) {
+									if (direction[0] == 0)
+										directions[direction[1] == 1 ? 0 : 1] = true;
+									else
+										directions[direction[0] == -1 ? 2 : 3] = true;
+								}
+							}
+						}
+					}
+				}
+			}
+			if ((selected = scrollDirections(directions)) == Directions::win) {
+				addInfo("You choose to cancel use.");
+				return;
+			}
+			auto direction = directionTable[static_cast<int>(selected)];
+			auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1]));
+			monsterObj->attitude = attitudes::agressive;
+			monsterObj->bePoisoned += bottle->increased;
+			addInfo("The monster was poisoned.");
+		}
+		auto it = player->backpack.begin() + backpackIndex;
+		player->backpack.erase(it);
+		delete item;
+	}
+	else { // key
+		auto key = dynamic_cast<Key*>(item);
+		if (key->direction == Directions::win) {
+			gotoWin();
+			return;
+		}
+		auto direction = directionTable[static_cast<int>(key->direction)];
+		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
+		if (globalMainMap->isOutOfRange(x + direction[0] * key->step, y + direction[1] * key->step)) {
+			addInfo("Destination beyond map boundary, player will move to boundary.");
+			switch (key->direction)
+			{
+			case Directions::up:
+				globalMainMap->SetMapLocation(x, 3);
+				break;
+			case Directions::down:
+				globalMainMap->SetMapLocation(x, 0);
+				break;
+			case Directions::left:
+				globalMainMap->SetMapLocation(0, y);
+				break;
+			case Directions::right:
+				globalMainMap->SetMapLocation(3, y);
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			addInfo("Arrive at your destination.");
+			globalMainMap->SetMapLocation(x + direction[0] * key->step, y + direction[1] * key->step);
+		}
+		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());\
+		key->useIt();
+	}
 }
 Directions Game::scrollDirections(bool* directionsEnable)
 {
@@ -657,10 +823,10 @@ Directions Game::scrollDirections(bool* directionsEnable)
 	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
 	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
 	
-	waddwstr(direction[static_cast<int>(Directions::up)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::down)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::left)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::right)], L"��");
+	waddwstr(direction[static_cast<int>(Directions::up)], L"↑");
+	waddwstr(direction[static_cast<int>(Directions::down)], L"↓");
+	waddwstr(direction[static_cast<int>(Directions::left)], L"←");
+	waddwstr(direction[static_cast<int>(Directions::right)], L"→");
 	Directions selected = Directions::win;
 	for (auto i : { Directions::up , Directions::down, Directions::left, Directions::right })
 		if (!directionsEnable[static_cast<int>(i)]) wbkgd(direction[static_cast<int>(i)], COLOR_INVALID);
@@ -840,18 +1006,18 @@ void Game::drawMap()
 		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
 		if (x == 0 && y == 0) {
 			mvwaddstr(map, 5, 0, "X");
-			mvwaddstr(map, 10, 9, "X");
+			mvwaddstr(map, 10, 9, "XX");
 		}
 		else if (x == 0 && y == 3) {
-			mvwaddstr(map, 0, 9, "X");
+			mvwaddstr(map, 0, 9, "XX");
 			mvwaddstr(map, 5, 0, "X");
 		}
 		else if (x == 3 && y == 3) {
-			mvwaddstr(map, 0, 9, "X");
+			mvwaddstr(map, 0, 9, "XX");
 			mvwaddstr(map, 5, 19, "X");
 		}
 		else {
-			mvwaddstr(map, 10, 9, "X");
+			mvwaddstr(map, 10, 9, "XX");
 			mvwaddstr(map, 5, 19, "X");
 		}
 	}
@@ -917,22 +1083,22 @@ void Game::nextRound()
 				{
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
 						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first - 1, creatureObj->position.second) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
 						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second + 1) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
 						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second - 1) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
 						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1);
 					}
 				}
@@ -990,14 +1156,54 @@ void Game::conjoure()
 						if (direction[0] == 0) 
 							directions[direction[1] == 1 ? 0 : 1] = true;
 						else
-							directions[direction[0] == -1 ? 0 : 1] = true;
+							directions[direction[0] == -1 ? 2 : 3] = true;
 					}
 				}
 			}
 		}
 	}
 	auto conjoureDirec = scrollDirections(directions);
+	if (conjoureDirec == Directions::win) return;
 	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
 	if (status)
 		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
+}
+void Game::pickup()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::item) {
+					if (direction[0] == 0)
+						directions[direction[1] == 1 ? 0 : 1] = true;
+					else
+						directions[direction[0] == -1 ? 2 : 3] = true;
+				}
+			}
+		}
+	}
+	auto itemDirec = scrollDirections(directions);
+	if (itemDirec == Directions::win) return;
+	auto status = player->pick( 
+		dynamic_cast<Item*>( 										\
+			globalMap->getLocationItem( 							\
+				x + directionTable[static_cast<int>(itemDirec)][0], \
+				y + directionTable[static_cast<int>(itemDirec)][1]  \
+			) 														\
+		) 															\
+	);
+	if (status)
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1]);
+}
+void Game::gotoWin()
+{
+	wined = true;
+	addInfo("**************************");
+	addInfo("Congratulations on your success in finding the win key. You win the game.");
+	addInfo("**************************");
+	addInfo("Press any key to end the game.");
+	getch();
 }
