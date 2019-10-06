@@ -24,9 +24,9 @@ public:
 	int GetMapYLocation();
 	Map &GetMapAt(int x, int y)
 	{
-		return ((maps[x])[y]);
+		return ((maps[y])[x]);
 	}
 	Map& GetCurrentMap() {
-		return GetMapAt(mainmap_x, mainmap_y);
+		return GetMapAt(mainmap_y, mainmap_x);
 	}
 };
