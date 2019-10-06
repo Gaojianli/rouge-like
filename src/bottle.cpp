@@ -3,8 +3,7 @@
 extern std::shared_ptr<Game> game;
 Bottle::Bottle()
 {
-	int type = (std::rand() % 3);
-	switch (type)
+	switch (std::rand() % 3)
 	{
 	case 0:
 	{
