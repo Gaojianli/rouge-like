@@ -111,9 +111,18 @@ void Game::init()
 			break;
 		}
 	}
+	const std::string roles[] = {
+		"magician",
+		"wizard",
+		"warrior",
+		"harpy",
+		"amazon",
+		"dwarf",
+		"monkey" };
 	for (int m = 0; m < 3; m++) // Generate three human NPC
 	{
-		Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
+		int role = std::rand() % 7;
+		Mankind* p = new Mankind({ 0, 0 }, (roles[role] + std::to_string(m)).c_str(), static_cast<Role>(role), static_cast<attitudes>(std::rand() % 2));
 		itemToDistribute.push_back(p);
 		characters.push_back(p);
 	}
@@ -253,6 +262,8 @@ inputName:
 				investigate();
 				break;
 			case MenuType::Control:
+				conjoure();
+				break;
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -859,11 +870,6 @@ void Game::nextRound()
 
 	for (auto& charac : characters)
 	{
-		for (int i = 4; i > 0; i--)
-		{
-			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
-				i++; //move failed, try again;
-		}
 		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
 		{ //attack randomly
 		}
@@ -875,7 +881,8 @@ void Game::nextRound()
 		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
-			monsterChar->beControlled--;
+			if (monsterChar->beControlled > 0)
+				monsterChar->beControlled--;
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
@@ -893,8 +900,10 @@ void Game::nextRound()
 				};
 				for (int i = 4; i > 0; i--)
 				{
-					if (creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
+					if (!creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
 						i++; //move failed, try again;
+					else
+						globalMap->setGameObjectat(creatureObj->position.first, creatureObj->position.second, creatureObj);
 				}
 				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true)
 				{ //attack randomly
@@ -965,4 +974,30 @@ void Game::investigate() {
 			}
 		}
 	}
+}
+
+void Game::conjoure()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::creature) {
+					auto creatureObject= globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+					if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
+						if (direction[0] == 0) 
+							directions[direction[1] == 1 ? 0 : 1] = true;
+						else
+							directions[direction[0] == -1 ? 0 : 1] = true;
+					}
+				}
+			}
+		}
+	}
+	auto conjoureDirec = scrollDirections(directions);
+	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+	if (status)
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1]);
 }

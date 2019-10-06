@@ -4,8 +4,8 @@ enum class Directions
 {
 	up = 0,
 	down,
-	right,
 	left,
+	right,
 	win
 };
 class Key : public Item
