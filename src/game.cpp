@@ -179,12 +179,15 @@ void Game::start()
 	WINDOW** menu = nullptr;
 	bool menuEnable[7] = { true,true,true,true,true,true,true };
 	MenuType menuChoose = MenuType::Attack;
+	bool moveStatus = false;
 	while (true)
 	{
 		drawMap();
-		drawPlayer();
+		if (moveStatus)
+			drawPlayer();
+		moveStatus = false;
 		ch = getch();
-		switch (bool moveStatus = false; ch)
+		switch (ch)
 		{
 		case 'M':
 		case 'm':
