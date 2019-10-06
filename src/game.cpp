@@ -7,12 +7,28 @@
 #include "curses/curses.h"
 #include <cmath>
 #include <functional>
+#include <comutil.h>  
+#pragma comment(lib, "comsuppw.lib") 
+using std::string;
+string ws2s(const std::wstring& ws) {
+	_bstr_t t = ws.c_str();
+	char* pchar = (char*)t;
+	string result = pchar;
+	return result;
+}
+std::wstring s2ws(const string& s) {
+	_bstr_t t = s.c_str();
+	wchar_t* pwchar = (wchar_t*)t;
+	std::wstring result = pwchar;
+	return result;
+}
+
+
 
 #define COLOR_NORMAL COLOR_PAIR(1)
 #define COLOR_SELECTED COLOR_PAIR(2)
 #define COLOR_INVALID COLOR_PAIR(3)
 
-using std::string;
 void Game::init()
 {
 	initscr();
@@ -28,7 +44,7 @@ void Game::init()
 	// Generate items
 	std::pair<int, int> zeropair = std::make_pair(0, 0);
 	int bottlenum = (std::rand() % 8 + 16);
-	std::vector<gameObject *> item_to_distribute;
+	std::vector<gameObject*> item_to_distribute;
 	for (int i = 0; i < bottlenum; i++) // Add bottle to item list
 	{
 		item_to_distribute.push_back(new Bottle());
@@ -98,7 +114,7 @@ void Game::start()
 		"harpy",
 		"amazon",
 		"dwarf",
-		"monkey"};
+		"monkey" };
 	for (int i = 0; i < 7; i++)
 	{
 		if (i == 0)
@@ -148,13 +164,13 @@ void Game::start()
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({0, 0}, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ 0, 0 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
 	refresh();
 	drawMain();
-	WINDOW **menu = nullptr;
+	WINDOW** menu = nullptr;
 	bool menuEnable[7] = { true,true,true,true,true,true,true };
 	MenuType menuChoose = MenuType::Attack;
 	while (true)
@@ -218,19 +234,19 @@ void Game::drawPlayer()
 	Help
 	Exit
 */
-WINDOW **Game::drawMenu(bool *menuEnable)
+WINDOW** Game::drawMenu(bool* menuEnable)
 {
-	const char *muneStr[]{
+	const char* muneStr[]{
 		"Investigation",
 		"Attack",
 		"Control",
 		"Pick up",
 		"Backpack",
 		"Help",
-		"Exit"};
+		"Exit" };
 	int i;
-	WINDOW **items;
-	items = (WINDOW **)malloc(8 * sizeof(WINDOW *));
+	WINDOW** items;
+	items = (WINDOW * *)malloc(8 * sizeof(WINDOW*));
 
 	items[0] = newwin(9, 15, 3, 83);
 	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
@@ -243,7 +259,7 @@ WINDOW **Game::drawMenu(bool *menuEnable)
 	items[7] = subwin(items[0], 1, 13, 10, 84);
 	for (i = 0; i < 7; i++) {
 		wprintw(items[i + 1], muneStr[i]);
-		if(!menuEnable[i]) wbkgd(items[i+1], COLOR_INVALID);
+		if (!menuEnable[i]) wbkgd(items[i + 1], COLOR_INVALID);
 	}
 	i = 0;
 	while (!menuEnable[i++]);
@@ -251,7 +267,7 @@ WINDOW **Game::drawMenu(bool *menuEnable)
 	wrefresh(items[0]);
 	return items;
 }
-MenuType Game::scrollMenu(WINDOW **items, int count, bool *menuEnable)
+MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 {
 	int key;
 	int selected = 0;
@@ -287,7 +303,7 @@ MenuType Game::scrollMenu(WINDOW **items, int count, bool *menuEnable)
 		}
 	}
 }
-void Game::deleteMenu(WINDOW **items, int count)
+void Game::deleteMenu(WINDOW** items, int count)
 {
 	int i;
 	for (i = 0; i < count; i++)
@@ -322,7 +338,7 @@ bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, s
 	for (auto direction : directionTable) {
 		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
 			pf(x + direction[0], y + direction[1], flag);
-			
+
 		}
 	}
 	return flag;
@@ -332,7 +348,7 @@ bool Game::isAround(ObjectType target) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
-	});
+		});
 }
 bool Game::canControlAround()
 {
@@ -344,14 +360,34 @@ bool Game::canControlAround()
 				flag = true;
 			}
 		}
-	});
+		});
 }
-void Game::addInfo(const char *message)
+void Game::addInfo(const char* message)
 {
 	auto messageStr = string(message);
 	while (messageStr.length() % 96 != 0)
 	{
 		messageStr += " ";
+	}
+	for (int i = 0; i < messageStr.length() / 96; i++)
+	{
+		infoList[header++] = s2ws(messageStr.substr(i * 96, 96));
+		header %= 17;
+	}
+	for (int i = 0; i < 17; i++)
+	{
+		wmove(info, i + 1, 1);
+		waddwstr(info, infoList[(i + header) % 17].c_str());
+	}
+	wrefresh(info);
+}
+
+void Game::addInfo(const wchar_t* message)
+{
+	auto messageStr = std::wstring(message);
+	while (messageStr.length() % 96 != 0)
+	{
+		messageStr += L" ";
 	}
 	for (int i = 0; i < messageStr.length() / 96; i++)
 	{
@@ -361,14 +397,15 @@ void Game::addInfo(const char *message)
 	for (int i = 0; i < 17; i++)
 	{
 		wmove(info, i + 1, 1);
-		waddstr(info, infoList[(i + header) % 17].c_str());
+		waddwstr(info, infoList[(i + header) % 17].c_str());
 	}
 	wrefresh(info);
 }
 
+
 void Game::drawMap()
 {
-	auto item = std::vector<gameObject *>{
+	auto item = std::vector<gameObject*>{
 		new Bottle(BottleType::bloodBottle, 10),
 		new Bottle(BottleType::bloodBottle, 10),
 		new Bottle(BottleType::bloodBottle, 10),
@@ -406,7 +443,7 @@ void Game::drawMap()
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
-	for (auto &charac : characters)
+	for (auto& charac : characters)
 	{
 		for (int i = 4; i > 0; i--)
 		{
@@ -421,18 +458,18 @@ void Game::nextRound()
 			charac->health -= charac->bePoisoned * 2; //health loss of ponison
 			charac->bePoisoned--;
 		}
-		if (auto monsterChar = dynamic_cast<Monster *>(charac); monsterChar != nullptr)
+		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
 			monsterChar->beControlled--;
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
-	for (auto &obj : sameRoomCharacters)
+	for (auto& obj : sameRoomCharacters)
 	{
 		if (obj->getType() == ObjectType::creature)
 		{
-			if (auto creatureObj = dynamic_cast<Creature *>(obj); creatureObj->name != player->name)
+			if (auto creatureObj = dynamic_cast<Creature*>(obj); creatureObj->name != player->name)
 			{
 				//temp function to calculate distance
 				auto calDistance = [](std::pair<int, int> postionA, std::pair<int, int> postionB) {
@@ -453,7 +490,7 @@ void Game::nextRound()
 					}
 				}
 				//NPC pick item
-				if (auto mankindObj = dynamic_cast<Mankind *>(creatureObj); mankindObj != nullptr)
+				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr)
 				{
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
