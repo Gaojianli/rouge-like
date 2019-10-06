@@ -112,31 +112,23 @@ void Game::init()
 			break;
 		}
 	}
-	for (int m = 0; m < 3; m++) // Generate three human enemy
-		{
-			Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
-			itemToDistribute.push_back(p);
-			characters.push_back(p);
-		}
-		// Init Maps.
-		globalMainMap = std::make_shared<MainMap>(MainMap());
-		// Roll Map.
-		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+	for (int m = 0; m < 3; m++) // Generate three human NPC
+	{
+		Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
+		itemToDistribute.push_back(p);
+		characters.push_back(p);
+	}
+	// Init Maps.
+	globalMainMap = std::make_shared<MainMap>(MainMap());
+	// Roll Map.
+	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+	globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
 
-		// Send Items to Map
+	// Send Items to Map
 
-		for (auto i : itemToDistribute) {
-			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
-		}
-		/* // Test line
-		auto item = std::vector<gameObject*>{
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-		};
-		globalMap->distributeThings(item);
-		*/
+	for (auto i : itemToDistribute) {
+		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+	}
 }
 
 void Game::start()
@@ -220,7 +212,7 @@ inputName:
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({ rand()%9, rand()%9 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ rand() % 9, rand() % 9 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
@@ -345,14 +337,14 @@ void Game::drawBackPack()
 	backpackWin[7] = subwin(backpackWin[3], 4, 7, 8, 66);
 	backpackWin[8] = subwin(backpackWin[4], 4, 7, 8, 74);
 	for (auto i : { 1,2,3,4 }) wborder(backpackWin[i], '|', '|', '-', '-', '+', '+', '+', '+');
-	
+
 	wrefresh(backpackWin[0]);
 }
-void showItemInWin(WINDOW *win, Item &item) {
+void showItemInWin(WINDOW* win, Item& item) {
 	switch (item.getItemType())
 	{
 	case ItemType::bottle:
-		mvwaddstr(win, 0, 0,"");
+		mvwaddstr(win, 0, 0, "");
 		break;
 	case ItemType::key:
 		break;
@@ -536,7 +528,7 @@ bool Game::isAround(ObjectType target) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
-	});
+		});
 }
 
 bool Game::canControlAround()
@@ -549,7 +541,7 @@ bool Game::canControlAround()
 				flag = true;
 			}
 		}
-	});
+		});
 }
 
 void Game::addInfo(const char* message)
@@ -722,7 +714,7 @@ void Game::printHelp()
 	addInfo("m       --Show/Hide menu");
 }
 
-void Game::investigate(){
+void Game::investigate() {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
 	auto x = playerPosition.first, y = playerPosition.second;
