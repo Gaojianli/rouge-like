@@ -23,8 +23,6 @@ std::wstring s2ws(const string& s) {
 	return result;
 }
 
-
-
 #define COLOR_NORMAL COLOR_PAIR(1)
 #define COLOR_SELECTED COLOR_PAIR(2)
 #define COLOR_INVALID COLOR_PAIR(3)
@@ -233,6 +231,7 @@ void Game::drawBackPack()
 {
 
 }
+
 void Game::drawPlayer()
 {
 	if (playerWin != nullptr) {
@@ -244,6 +243,7 @@ void Game::drawPlayer()
 	wprintw(playerWin, "/\\");
 	wrefresh(playerWin);
 }
+
 /*
 	Investigation
 	Attack
@@ -287,6 +287,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 	wrefresh(items[0]);
 	return items;
 }
+
 MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 {
 	int key;
@@ -323,6 +324,7 @@ MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 		}
 	}
 }
+
 void Game::deleteMenu(WINDOW** items, int count)
 {
 	int i;
@@ -332,6 +334,7 @@ void Game::deleteMenu(WINDOW** items, int count)
 	touchwin(stdscr);
 	refresh();
 }
+
 void Game::drawMain()
 {
 	resize_term(34, 100);
@@ -350,6 +353,7 @@ void Game::drawMain()
 	//wbkgd(info, COLOR_PAIR(5));
 	refresh();
 }
+
 bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
@@ -363,6 +367,7 @@ bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, s
 	}
 	return flag;
 }
+
 bool Game::isAround(ObjectType target) {
 	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == target) {
@@ -370,6 +375,7 @@ bool Game::isAround(ObjectType target) {
 		}
 		});
 }
+
 bool Game::canControlAround()
 {
 	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
@@ -382,6 +388,7 @@ bool Game::canControlAround()
 		}
 		});
 }
+
 void Game::addInfo(const char* message)
 {
 	auto messageStr = string(message);
@@ -422,7 +429,6 @@ void Game::addInfo(const wchar_t* message)
 	wrefresh(info);
 }
 
-
 void Game::drawMap()
 {
 	auto mapStr = globalMap->drawablemap();
@@ -454,6 +460,7 @@ void Game::drawMap()
 	}
 	wrefresh(map);
 }
+
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
@@ -495,8 +502,8 @@ void Game::nextRound()
 			{
 				//temp function to calculate distance
 				auto calDistance = [](std::pair<int, int> postionA, std::pair<int, int> postionB) {
-					auto sumX = powf(postionA.first - postionB.first, 2);
-					auto sumY = powf(postionA.second - postionB.second, 2);
+					auto sumX = powf(float(postionA.first - postionB.first), float(2.0));
+					auto sumY = powf(float(postionA.second - postionB.second), float(2.0));
 					return sqrt(sumX + sumY);
 				};
 				for (int i = 4; i > 0; i--)
