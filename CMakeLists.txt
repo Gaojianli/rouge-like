@@ -20,7 +20,7 @@ add_executable(rouge-like
    ${DIR_SRCS}
 )
 if(WIN32)
-target_link_libraries(rouge-like "${PROJECT_SOURCE_DIR}/pdcurses.lib")
+target_link_libraries(rouge-like "${PROJECT_SOURCE_DIR}/pdcurses.lib" comsuppw.lib)
 elseif(UNIX)
 target_link_libraries(rouge-like ncurses)
 endif()
