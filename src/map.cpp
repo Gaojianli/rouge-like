@@ -75,7 +75,7 @@ bool *Map::getGates()
 }
 int Map::getPortal()
 {
-	return 0;
+	return portal_stat;
 	//return enable_portal;
 }
 std::vector<gameObject *> &Map::getSameRoomObjectList()
