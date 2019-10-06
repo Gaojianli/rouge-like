@@ -8,6 +8,7 @@
 #include <cmath>
 #include <functional>
 #include <comutil.h>
+#include <time.h>
 using std::string;
 string ws2s(const std::wstring& ws) {
 	_bstr_t t = ws.c_str();
@@ -38,6 +39,8 @@ void Game::init()
 	curs_set(0);
 	raw();
 	noecho();
+	// Set time based random seed
+	std::srand(time(nullptr));
 	// Generate items
 	std::vector<gameObject*> itemToDistribute;
 	for (int i = 0; i < std::rand() % 8 + 16; i++) // Add bottle to item list
