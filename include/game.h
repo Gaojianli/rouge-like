@@ -11,8 +11,8 @@ enum class MenuType
 {
 	Investigation = 0,
 	Attack,
-	PickUp,
 	Control,
+	PickUp,
 	Backpack,
 	NextRound,
 	Help,
@@ -25,13 +25,14 @@ class Game
 private:
 	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
-	WINDOW *menubar, *map, *info, *status, *playerWin;
+	WINDOW *menubar, *map, *info, *status, *playerWin, *backpackWin, *playerStatusWin;
 	std::wstring infoList[17];
 	int header = 0;
 	MainMap mainmap;
 	void drawMain();
 	void drawMap();
 	void drawBackPack();
+	void drawPlayerStatus();
 	void drawPlayer();
 	WINDOW** drawMenu(bool* menuEnable);
 	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);

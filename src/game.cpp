@@ -178,7 +178,7 @@ void Game::start()
 	refresh();
 	drawMain();
 	WINDOW** menu = nullptr;
-	bool menuEnable[8] = { true,true,true,true,true,true,true,true};
+	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
 	while (true)
 	{
@@ -186,6 +186,7 @@ void Game::start()
 			drawMap();
 			drawPlayer();
 		}
+		drawPlayerStatus();
 		moveStatus = false;
 		ch = getch();
 		switch (ch)
@@ -194,6 +195,7 @@ void Game::start()
 		case 'm':
 			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
+			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
 			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
@@ -225,13 +227,46 @@ void Game::start()
 		default:
 			break;
 		}
-		
+
 	}
 }
 
 void Game::drawBackPack()
 {
 
+}
+/*
+	name: name
+	role: role
+	HP: health/healthUpper
+	MP: mana/manaUpper
+	ATK/DEF: getAttack/getDefense
+	Move Points: movePoints
+*/
+void Game::drawPlayerStatus()
+{
+	const char* roles[] = {
+		"Magician",
+		"Wizard",
+		"Warrior",
+		"Harpy",
+		"Amazon",
+		"Dwarf",
+		"Monkey" };
+	if (playerStatusWin != nullptr) {
+		delwin(playerStatusWin);
+		touchwin(stdscr);
+		refresh();
+	}
+	playerStatusWin = subwin(status, 11, 18, 2, 81);
+	wborder(playerStatusWin, '|', '|', '-', '-', '+', '+', '+', '+');
+	mvwprintw(playerStatusWin, 2, 1, "Name: %s", player->name.c_str());
+	mvwprintw(playerStatusWin, 3, 1, "Role: %s", roles[static_cast<int>(player->role)]);
+	mvwprintw(playerStatusWin, 4, 1, "HP: %d/%d", player->health, player->healthUpper);
+	mvwprintw(playerStatusWin, 5, 1, "MP: %d/%d", player->mana, player->manaUpper);
+	mvwprintw(playerStatusWin, 6, 1, "ATK/DEF: %d/%d", player->getAttack(), player->getDefense());
+	mvwprintw(playerStatusWin, 7, 1, "Move Points: %d", player->movePoints);
+	wrefresh(playerStatusWin);
 }
 void Game::drawPlayer()
 {
@@ -241,7 +276,7 @@ void Game::drawPlayer()
 		refresh();
 	}
 	playerWin = subwin(map, 1, 2, 11 - player->position.second, 2 + player->position.first * 2);
-	wprintw(playerWin,"/\\");
+	wprintw(playerWin, "/\\");
 	wrefresh(playerWin);
 }
 /*
@@ -265,7 +300,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 		"Help",
 		"Exit" };
 	int i;
-	WINDOW** items = new WINDOW*[9];
+	WINDOW** items = new WINDOW * [9];
 
 	items[0] = newwin(11, 16, 2, 22);
 	wborder(items[0], '|', '|', '-', '-', '+', '+', '+', '+');
@@ -368,7 +403,7 @@ bool Game::isAround(ObjectType target) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
-		});
+	});
 }
 bool Game::canControlAround()
 {
@@ -380,7 +415,7 @@ bool Game::canControlAround()
 				flag = true;
 			}
 		}
-		});
+	});
 }
 void Game::addInfo(const char* message)
 {
