@@ -179,6 +179,7 @@ bool Map::isOutOfRange(int x, int y)
 }
 ObjectType Map::getLocationType(int x, int y)
 {
+	if (isOutOfRange(x, y)) { return ObjectType::nothing; }
 	if (nullptr == (mapcontent[y])[x])
 	{
 		return ObjectType::nothing;
