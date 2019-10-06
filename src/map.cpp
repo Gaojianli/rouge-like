@@ -148,12 +148,13 @@ void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
 	if (nullptr != (mapcontent[dst_y])[dst_x]) {
 		return;
 	}
-	else if((mapcontent[src_y])[src_x])
+	else if(nullptr==(mapcontent[src_y])[src_x])
 	{
 		return;
 	}
 	else {
 		(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
+		(mapcontent[src_y])[src_x] = nullptr;
 	}
 }
 std::vector<std::string> Map::drawablemap()
