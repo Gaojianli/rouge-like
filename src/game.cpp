@@ -75,7 +75,7 @@ void Game::init()
 		{
 		case 0:
 		{
-			Monster * m = new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2));
+			Monster* m = new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2));
 			itemToDistribute.push_back(m);
 			characters.push_back(m);
 			break;
@@ -111,7 +111,8 @@ void Game::init()
 		default:
 			break;
 		}
-		for (int m = 0; m < 3; m++) // Generate three human enemy
+	}
+	for (int m = 0; m < 3; m++) // Generate three human enemy
 		{
 			Mankind* p = new Mankind({ 0, 0 }, (std::string("Human ") + std::to_string(m)).c_str(), static_cast<Role>(std::rand() % 7), static_cast<attitudes>(std::rand() % 2));
 			itemToDistribute.push_back(p);
@@ -136,7 +137,6 @@ void Game::init()
 		};
 		globalMap->distributeThings(item);
 		*/
-	}
 }
 
 void Game::start()
