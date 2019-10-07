@@ -133,12 +133,12 @@ void Game::init()
 	globalMainMap = std::make_shared<MainMap>(MainMap());
 	// Roll Map.
 	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-	globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+	globalMap=globalMainMap-> GetCurrentMap();
 
 	// Send Items to Map
 
 	for (auto i : itemToDistribute) {
-		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
+		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4))->randomSetThings(i);
 	}
 }
 
@@ -310,11 +310,11 @@ inputName:
 					// right
 					if (!globalMainMap->isOutOfRange(x + 1, y)) {
 						globalMainMap->SetMapLocation(x + 1, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You enter the room on the right.");
 					}else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
 						globalMainMap->SetMapLocation(x - 3, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You pass through the portal to the far left of the map.");
 					}
 				}
@@ -322,12 +322,12 @@ inputName:
 					// left
 					if (!globalMainMap->isOutOfRange(x - 1, y)) {
 						globalMainMap->SetMapLocation(x - 1, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You enter the room on the left.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x + 3, y)) {
 						globalMainMap->SetMapLocation(x + 3, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You pass through the portal to the far right of the map.");
 					}
 				}
@@ -337,12 +337,12 @@ inputName:
 					// up
 					if (!globalMainMap->isOutOfRange(x, y + 1)) {
 						globalMainMap->SetMapLocation(x, y + 1);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You enter the room on the up.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y - 3)) {
 						globalMainMap->SetMapLocation(x, y - 3);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You pass through the portal to the far down of the map.");
 					}
 				}
@@ -350,12 +350,12 @@ inputName:
 					// down
 					if (!globalMainMap->isOutOfRange(x, y - 1)) {
 						globalMainMap->SetMapLocation(x, y - 1);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You enter the room on the down.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y + 3)) {
 						globalMainMap->SetMapLocation(x, y + 3);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap=globalMainMap-> GetCurrentMap();
 						addInfo("You pass through the portal to the far up of the map.");
 					}
 				}
@@ -823,7 +823,7 @@ void Game::useItem(int backpackIndex)
 			addInfo("Arrive at your destination.");
 			globalMainMap->SetMapLocation(x + direction[0] * key->step, y + direction[1] * key->step);
 		}
-		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());\
+		globalMap=globalMainMap-> GetCurrentMap();
 		key->useIt();
 	}
 }
@@ -913,7 +913,7 @@ void Game::drawMain()
 }
 
 template<typename Callback>
-bool _isAround(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, Callback _callback) {
+bool _isAround(Map* globalMap, std::shared_ptr<Player> player, Callback _callback) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
 	auto x = playerPosition.first, y = playerPosition.second;
@@ -1048,9 +1048,9 @@ void Game::nextRound()
 
 	//regenerate bottles
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
-		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
-		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 
 	for (auto& charac : characters)
 	{

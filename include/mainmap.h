@@ -22,11 +22,11 @@ public:
 	bool isOutOfRange(int x, int y);
 	int GetMapXLocation();
 	int GetMapYLocation();
-	Map &GetMapAt(int x, int y)
+	Map*GetMapAt(int x, int y)
 	{
-		return ((maps[y])[x]);
+		return &((maps[y])[x]);
 	}
-	Map& GetCurrentMap() {
+	Map* GetCurrentMap() {
 		return GetMapAt(mainmap_x, mainmap_y);
 	}
 };

@@ -53,7 +53,7 @@ private:
 	void printHelp();
 	void investigate();
 public:
-	std::shared_ptr<Map> globalMap;
+	Map* globalMap;
 	std::list<Creature*> characters;
 	std::shared_ptr<MainMap> globalMainMap;
 	Game() = default;
