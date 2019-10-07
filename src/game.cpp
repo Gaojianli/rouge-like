@@ -180,10 +180,10 @@ inputName:
 		{
 			string toInsert = "*";
 			toInsert += roles[i];
-			mvprintw(5 + i, COLS / 2 - 21, toInsert.c_str()); //default select
+			mvprintw(6 + i, COLS / 2 - 16, toInsert.c_str()); //default select
 		}
 		else
-			mvprintw(5 + i, COLS / 2 - 20, roles[i].c_str());
+			mvprintw(6 + i, COLS / 2 - 15, roles[i].c_str());
 	}
 	int ch;
 	int postion = 0;
@@ -197,23 +197,23 @@ inputName:
 		switch (ch)
 		{
 		case KEY_UP:
-			move(5 + postion, 0);
+			move(6 + postion, 0);
 			clrtoeol();
-			mvprintw(5 + postion, COLS / 2 - 20, roles[postion].c_str());
+			mvprintw(6 + postion, COLS / 2 - 15, roles[postion].c_str());
 			if (postion != 0)
 				postion--;
 			toInsert += roles[postion];
-			mvprintw(5 + postion, COLS / 2 - 21, toInsert.c_str());
+			mvprintw(6 + postion, COLS / 2 - 16, toInsert.c_str());
 			refresh();
 			break;
 		case KEY_DOWN:
-			move(5 + postion, 0);
+			move(6 + postion, 0);
 			clrtoeol();
-			mvprintw(5 + postion, COLS / 2 - 20, roles[postion].c_str());
+			mvprintw(6 + postion, COLS / 2 - 15, roles[postion].c_str());
 			if (postion != 6)
 				postion++;
 			toInsert += roles[postion];
-			mvprintw(5 + postion, COLS / 2 - 21, toInsert.c_str());
+			mvprintw(6 + postion, COLS / 2 - 16, toInsert.c_str());
 			refresh();
 			break;
 		case 13: //enter
@@ -568,14 +568,7 @@ WINDOW** Game::drawMenu(bool* menuEnable)
 	items[7] = subwin(items[0], 1, 13, 9, 23);
 	items[8] = subwin(items[0], 1, 13, 10, 23);
 	for (i = 0; i < 8; i++) {
-		wprintw(items[i + 1], muneStr[i]);
-		if (!menuEnable[i]) wbkgd(items[i + 1], COLOR_INVALID);
-	}
-	i = 0;
-	while (!menuEnable[i++]);
-	wbkgd(items[i], COLOR_SELECTED);
-	wrefresh(items[0]);
-	return items;
+		 
 }
 
 MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
