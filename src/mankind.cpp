@@ -148,7 +148,10 @@ bool Mankind::pick(Item* toPick)
 		return true;
 	}
 	else
+	{
+		game->addInfo("Pick up failed. Backpack is full!");
 		return false;
+	}
 }
 
 CreatureType Mankind::getCreatureType() {
