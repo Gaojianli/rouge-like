@@ -42,6 +42,7 @@ bool Bottle::use(Creature* target)
 			target->health += this->increased;
 			target->health = target->health > int(target->healthUpper) ? target->healthUpper : target->health;
 			return true;
+			break;
 		case BottleType::manaBottle:
 			if (target->getCreatureType() == CreatureType::monster)
 			{
@@ -54,6 +55,7 @@ bool Bottle::use(Creature* target)
 				mankind->mana = mankind->mana > mankind->getManaUpper() ? mankind->getManaUpper() : mankind->mana;
 				return true;
 			}
+			break;
 		case BottleType::poison:
 			target->bePoisoned += this->increased;
 			target->beAttacked = true;

@@ -794,10 +794,7 @@ void Game::useItem(int backpackIndex)
 				return;
 			}
 			auto direction = directionTable[static_cast<int>(selected)];
-			auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1]));
-			useStatus = bottle->use(monsterObj);
-			//monsterObj->attitude = attitudes::agressive;
-			//monsterObj->bePoisoned += bottle->increased;
+			useStatus = bottle->use(globalMap->getLocationCreature(x + direction[0], y + direction[1]));
 			addInfo("The monster was poisoned.");
 		}
 		if (useStatus) {
