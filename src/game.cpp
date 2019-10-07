@@ -753,14 +753,10 @@ void Game::useItem(int backpackIndex)
 	if (item->getItemType() == ItemType::bottle) {
 		auto bottle = dynamic_cast<Bottle*>(item);
 		if (bottle->type == BottleType::bloodBottle) {
-			//player->health = player->health + bottle->increased > player->healthUpper ? \
-				player->healthUpper : player->health + bottle->increased;
 			useStatus = bottle->use(&*player);
 			addInfo("Used blood bottle. HP up!");
 		}
 		else if (bottle->type == BottleType::manaBottle) {
-			//player->mana = player->mana + bottle->increased > player->getManaUpper() ? \
-				player->getManaUpper() : player->mana + bottle->increased;
 			useStatus = bottle->use(&*player);
 			addInfo("Used mana bottle. MP up!");
 		}
