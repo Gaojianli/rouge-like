@@ -12,9 +12,10 @@ enum class Role {
 };
 class Monster;
 class Mankind:public Creature {
+private:
+	unsigned manaUpper=0;
 public:
 	unsigned mana=0;
-	unsigned manaUpper=0;
 	std::vector<Item*> backpack;
 	bool pick(Item* toPick);
 	Role role;
@@ -27,4 +28,7 @@ public:
 	void interactiveThis() override {};
 	int getAttack() override;
 	int getDefense() override;
+	unsigned getMana();
+	unsigned getManaUpper();
+	void changeMana(int amount);
 };

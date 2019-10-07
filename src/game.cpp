@@ -385,16 +385,19 @@ void showItemInWin(WINDOW* win, Item* item) {
 			mvwaddstr(win, 1, 0, " Bottle");
 			mvwaddstr(win, 2, 0, "       ");
 			mvwprintw(win, 3, 0, "HP: %d", dynamic_cast<Bottle*>(item)->increased);
+			break;
 		case BottleType::manaBottle:
 			mvwaddstr(win, 0, 0, "Mana   ");
 			mvwaddstr(win, 1, 0, " Bottle");
 			mvwaddstr(win, 2, 0, "       ");
 			mvwprintw(win, 3, 0, "MP: %d", dynamic_cast<Bottle*>(item)->increased);
+			break;
 		case BottleType::poison:
 			mvwaddstr(win, 0, 0, "Poison ");
 			mvwaddstr(win, 1, 0, " Bottle");
 			mvwaddstr(win, 2, 0, "       ");
 			mvwprintw(win, 3, 0, "R: %d", dynamic_cast<Bottle*>(item)->increased);
+			break;
 		default:
 			break;
 		}
@@ -514,7 +517,7 @@ void Game::drawPlayerStatus()
 	mvwprintw(playerStatusWin, 2, 1, "Name: %s", player->name.c_str());
 	mvwprintw(playerStatusWin, 3, 1, "Role: %s", roles[static_cast<int>(player->role)]);
 	mvwprintw(playerStatusWin, 4, 1, "HP: %d/%d", player->health, player->healthUpper);
-	mvwprintw(playerStatusWin, 5, 1, "MP: %d/%d", player->mana, player->manaUpper);
+	mvwprintw(playerStatusWin, 5, 1, "MP: %d/%d", player->mana, player->getManaUpper());
 	mvwprintw(playerStatusWin, 6, 1, "ATK/DEF: %d/%d", player->getAttack(), player->getDefense());
 	mvwprintw(playerStatusWin, 7, 1, "Move Points: %d", player->movePoints);
 	wrefresh(playerStatusWin);
@@ -746,16 +749,19 @@ void Game::useItem(int backpackIndex)
 {
 	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
 	auto item = player->backpack[backpackIndex];
+	bool useStatus = false;;
 	if (item->getItemType() == ItemType::bottle) {
 		auto bottle = dynamic_cast<Bottle*>(item);
 		if (bottle->type == BottleType::bloodBottle) {
-			player->health = player->health + bottle->increased > player->healthUpper ? \
+			//player->health = player->health + bottle->increased > player->healthUpper ? \
 				player->healthUpper : player->health + bottle->increased;
+			useStatus = bottle->use(&*player);
 			addInfo("Used blood bottle. HP up!");
 		}
 		else if (bottle->type == BottleType::manaBottle) {
-			player->mana = player->mana + bottle->increased > player->manaUpper ? \
-				player->manaUpper : player->mana + bottle->increased;
+			//player->mana = player->mana + bottle->increased > player->getManaUpper() ? \
+				player->getManaUpper() : player->mana + bottle->increased;
+			useStatus = bottle->use(&*player);
 			addInfo("Used mana bottle. MP up!");
 		}
 		else {
@@ -769,12 +775,18 @@ void Game::useItem(int backpackIndex)
 						if (objectType == ObjectType::creature) {
 							auto creatureObject = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
 							if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
-								if (monsterObj->beControlled != 0) {
+								if (monsterObj->beControlled == 0) {
 									if (direction[0] == 0)
 										directions[direction[1] == 1 ? 0 : 1] = true;
 									else
 										directions[direction[0] == -1 ? 2 : 3] = true;
 								}
+							}
+							else {
+								if (direction[0] == 0)
+									directions[direction[1] == 1 ? 0 : 1] = true;
+								else
+									directions[direction[0] == -1 ? 2 : 3] = true;
 							}
 						}
 					}
@@ -786,13 +798,18 @@ void Game::useItem(int backpackIndex)
 			}
 			auto direction = directionTable[static_cast<int>(selected)];
 			auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1]));
-			monsterObj->attitude = attitudes::agressive;
-			monsterObj->bePoisoned += bottle->increased;
+			useStatus = bottle->use(monsterObj);
+			//monsterObj->attitude = attitudes::agressive;
+			//monsterObj->bePoisoned += bottle->increased;
 			addInfo("The monster was poisoned.");
 		}
-		auto it = player->backpack.begin() + backpackIndex;
-		player->backpack.erase(it);
-		delete item;
+		if (useStatus) {
+			auto it = player->backpack.begin() + backpackIndex;
+			player->backpack.erase(it);
+			delete item;
+		}
+		else
+			addInfo("Use failed.");
 	}
 	else { // key
 		auto key = dynamic_cast<Key*>(item);
