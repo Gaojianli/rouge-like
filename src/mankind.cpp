@@ -112,6 +112,7 @@ int Mankind::getDefense()
 bool Mankind::attack(Creature& beAttack)
 {
 	beAttack.beAttacked = true;
+	beAttack.attitude = attitudes::agressive;
 	//calculate attack sum
 	int attackSum = this->getAttack();
 	//calculate defends sum
@@ -138,7 +139,7 @@ bool Mankind::attack(Creature& beAttack)
 
 bool Mankind::pick(Item* toPick)
 {
-	if (backpack.size() <= 4) //backpack is full
+	if (backpack.size() < 4) //backpack is full
 	{
 		this->backpack.push_back(toPick);
 		if (auto weaponItem = dynamic_cast<Weapons*>(toPick); weaponItem != nullptr) {

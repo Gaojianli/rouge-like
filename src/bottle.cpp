@@ -57,6 +57,7 @@ bool Bottle::use(Creature* target)
 		case BottleType::poison:
 			target->bePoisoned += this->increased;
 			target->beAttacked = true;
+			target->attitude = attitudes::agressive;
 			return true;
 			break;
 		default:

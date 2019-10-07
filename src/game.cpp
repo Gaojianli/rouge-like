@@ -1078,7 +1078,10 @@ void Game::nextRound()
 		if (charac->bePoisoned > 0)
 		{
 			charac->health -= charac->bePoisoned * 2; //health loss of ponison
-			charac->bePoisoned--;
+			if (charac->health <= 0)
+				charac->died();
+			else
+				charac->bePoisoned--;
 		}
 		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
