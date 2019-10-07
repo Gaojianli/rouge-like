@@ -125,10 +125,7 @@ void Map::eraseGameObjectAt(int x, int y)
 }
 void Map::eraseGameObjectAt(int x, int y, bool freeMemory)
 {
-	if (nullptr != (mapcontent[y])[x])
-	{
-		objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[y])[x]));
-	}
+	objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[y])[x]));
 	if (freeMemory) {
 		delete (mapcontent[y])[x];
 	}
