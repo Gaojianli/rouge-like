@@ -3,7 +3,7 @@
 #include <string>
 #include "game.h"
 extern std::shared_ptr<Game> game;
-Mankind::Mankind(std::pair<int, int> position, const char *name, Role role, attitudes attitude) : Creature(position.first, position.second, name, attitude), role(role)
+Mankind::Mankind(std::pair<int, int> position, const char* name, Role role, attitudes attitude) : Creature(position.first, position.second, name, attitude), role(role)
 {
 	switch (role)
 	{
@@ -46,7 +46,7 @@ Mankind::Mankind(std::pair<int, int> position, const char *name, Role role, atti
 }
 
 //control a monster, return true if succeed
-bool Mankind::conjure(Monster *object)
+bool Mankind::conjure(Monster* object)
 {
 	if (this->mana > object->power)
 	{ //enough mana
@@ -69,7 +69,7 @@ std::string Mankind::getInfo()
 		"harpy",
 		"amazon",
 		"dwarf",
-		"monkey"};
+		"monkey" };
 	/*
 	example:A magician. Which power is 5. Very dangerous.
 	*/
@@ -86,11 +86,11 @@ std::string Mankind::getInfo()
 int Mankind::getAttack()
 {
 	int attackSum = power;
-	for (auto &i : backpack)
+	for (auto& i : backpack)
 	{
 		if (i->getItemType() == ItemType::weapons)
 		{
-			attackSum += static_cast<Weapons *>(i)->attack;
+			attackSum += static_cast<Weapons*>(i)->attack;
 		}
 	}
 	return attackSum;
@@ -99,40 +99,44 @@ int Mankind::getAttack()
 int Mankind::getDefense()
 {
 	int defenseSum = power;
-	for (auto &i : backpack)
+	for (auto& i : backpack)
 	{
 		if (i->getItemType() == ItemType::weapons)
 		{
-			defenseSum += static_cast<Weapons *>(i)->defense;
+			defenseSum += static_cast<Weapons*>(i)->defense;
 		}
 	}
 	return defenseSum;
 }
 
-bool Mankind::attack(Creature &beAttack)
+bool Mankind::attack(Creature& beAttack)
 {
 	beAttack.beAttacked = true;
 	//calculate attack sum
 	int attackSum = this->getAttack();
 	//calculate defends sum
 	int defenseSum = beAttack.getDefense();
-	if (attackSum < defenseSum){
+	if (attackSum < defenseSum) {
 		game->addInfo((name + " attacked " + beAttack.name + ", but nothing happened").c_str());
 		return false; //nothing happened
 	}
 	else
 		beAttack.health -= attackSum - defenseSum;
-	if (beAttack.health < 0)
+	if (beAttack.health < 0) {
+		game->addInfo((name + " attacked " + beAttack.name + ", and made " + std::to_string(attackSum - defenseSum) + " damage. ").c_str());
 		beAttack.died();
-	for (auto &i : follower)
-	{ //monster be controlled will attack same object
-		i->attack(beAttack);
 	}
-	game->addInfo((name + " attacked " + beAttack.name + ", and made " + std::to_string(attackSum - defenseSum) + " damage. " + beAttack.name + " health is " + std::to_string(beAttack.health)).c_str());
+	else {
+		game->addInfo((name + " attacked " + beAttack.name + ", and made " + std::to_string(attackSum - defenseSum) + " damage. " + beAttack.name + " health is " + std::to_string(beAttack.health)).c_str());
+		for (auto& i : follower)
+		{ //monster be controlled will attack same object
+			i->attack(beAttack);
+		}
+	}
 	return true;
 }
 
-bool Mankind::pick(Item *toPick)
+bool Mankind::pick(Item* toPick)
 {
 	if (backpack.size() <= 4) //backpack is full
 	{
@@ -167,7 +171,7 @@ unsigned Mankind::getManaUpper()
 void Mankind::changeMana(int amount)
 {
 	if (amount < 0) {
-		if (abs(amount) > mana)
+		if (abs(amount) > int(mana))
 			mana = 0;
 		else
 			mana += amount;
