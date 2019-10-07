@@ -34,6 +34,7 @@ private:
 	MainMap mainmap;
 	void drawMain();
 	void drawMap();
+	void createPlayer();
 	void drawBackPack();
 	void drawPlayerStatus();
 	void drawPlayer();
