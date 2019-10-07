@@ -138,7 +138,7 @@ bool Mankind::attack(Creature& beAttack)
 
 bool Mankind::pick(Item* toPick)
 {
-	if (backpack.size() <= 4) //backpack is full
+	if (backpack.size() < 4) //backpack is full
 	{
 		this->backpack.push_back(toPick);
 		if (auto weaponItem = dynamic_cast<Weapons*>(toPick); weaponItem != nullptr) {
