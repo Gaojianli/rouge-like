@@ -8,6 +8,7 @@ enum class MonsterType
 	snake,
 	tarrasque
 };
+class Mankind;
 class Monster : public Creature
 {
 public:
@@ -16,6 +17,7 @@ public:
 	; //0 is not be controlled, other is the lasting time
 	void interactiveThis() override{};
 	MonsterType type;
+	Mankind* master;
 	int getAttack() override;
 	int getDefense() override;
 	CreatureType getCreatureType() override;

@@ -1065,8 +1065,13 @@ void Game::nextRound()
 		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
-			if (monsterChar->beControlled > 0)
+			if (monsterChar->beControlled > 0) {
 				monsterChar->beControlled--;
+				if (monsterChar->beControlled == 0) {
+					player->follower.erase(std::find(player->follower.begin(), player->follower.end(), monsterChar));
+					globalMap->randomSetThings(monsterChar);
+				}
+			}
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
