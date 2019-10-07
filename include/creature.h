@@ -25,8 +25,8 @@ public:
 	std::pair<int, int> position;
 	std::string name;
 	int health = 100;
-	int healthUpper = 100;
-	unsigned power = 100;
+	unsigned healthUpper = 100;
+	unsigned power = 10;
 	attitudes attitude;
 	bool beAttacked;
 	int bePoisoned;

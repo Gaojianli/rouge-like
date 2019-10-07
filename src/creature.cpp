@@ -14,6 +14,7 @@ void Creature::died()
 {
 	game->globalMap->eraseGameObjectAt(position.first, position.second, false);
 	game->characters.remove(this);
+	game->addInfo((this->name + " died.").c_str());
 	delete this;
 }
 

@@ -76,6 +76,8 @@ std::string Mankind::getInfo()
 	std::string introduction = "A ";
 	introduction += roles[(int)role];
 	introduction += ". Which power is " + std::to_string(this->power);
+	introduction += ", Health is ";
+	introduction += std::to_string(this->health) + "/" + std::to_string(this->healthUpper);
 	introduction += ". Very ";
 	introduction += (attitude == attitudes::agressive) ? "agressive." : "friendly.";
 	return introduction;

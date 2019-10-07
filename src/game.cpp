@@ -40,7 +40,7 @@ void Game::init()
 	raw();
 	noecho();
 	// Set time based random seed
-	std::srand(time(nullptr));
+	std::srand(unsigned(time(nullptr)));
 	// Generate items
 	std::vector<gameObject*> itemToDistribute;
 	for (int i = 0; i < std::rand() % 8 + 16; i++) // Add bottle to item list
@@ -133,7 +133,7 @@ void Game::init()
 	globalMainMap = std::make_shared<MainMap>(MainMap());
 	// Roll Map.
 	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-	globalMap=globalMainMap-> GetCurrentMap();
+	globalMap = globalMainMap->GetCurrentMap();
 
 	// Send Items to Map
 
@@ -255,10 +255,13 @@ inputName:
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
+			case MenuType::Attack:
+				attack();
+				break;
 			case MenuType::Backpack:
 				drawBackPack();
 				backpackScroll = scrollBackpack();
-				if(backpackScroll != -1) useOrThrowBackpack(backpackScroll);
+				if (backpackScroll != -1) useOrThrowBackpack(backpackScroll);
 				break;
 			case MenuType::PickUp:
 				pickup();
@@ -310,11 +313,12 @@ inputName:
 					// right
 					if (!globalMainMap->isOutOfRange(x + 1, y)) {
 						globalMainMap->SetMapLocation(x + 1, y);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You enter the room on the right.");
-					}else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
 						globalMainMap->SetMapLocation(x - 3, y);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You pass through the portal to the far left of the map.");
 					}
 				}
@@ -322,12 +326,12 @@ inputName:
 					// left
 					if (!globalMainMap->isOutOfRange(x - 1, y)) {
 						globalMainMap->SetMapLocation(x - 1, y);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You enter the room on the left.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x + 3, y)) {
 						globalMainMap->SetMapLocation(x + 3, y);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You pass through the portal to the far right of the map.");
 					}
 				}
@@ -337,12 +341,12 @@ inputName:
 					// up
 					if (!globalMainMap->isOutOfRange(x, y + 1)) {
 						globalMainMap->SetMapLocation(x, y + 1);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You enter the room on the up.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y - 3)) {
 						globalMainMap->SetMapLocation(x, y - 3);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You pass through the portal to the far down of the map.");
 					}
 				}
@@ -350,12 +354,12 @@ inputName:
 					// down
 					if (!globalMainMap->isOutOfRange(x, y - 1)) {
 						globalMainMap->SetMapLocation(x, y - 1);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You enter the room on the down.");
 					}
 					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y + 3)) {
 						globalMainMap->SetMapLocation(x, y + 3);
-						globalMap=globalMainMap-> GetCurrentMap();
+						globalMap = globalMainMap->GetCurrentMap();
 						addInfo("You pass through the portal to the far up of the map.");
 					}
 				}
@@ -611,7 +615,7 @@ int Game::scrollBackpack()
 {
 	int key;
 	int selected = 0;
-	int count = player->backpack.size();
+	size_t count = player->backpack.size();
 	wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
 	wnoutrefresh(backpackWin[selected + 5]);
 	while (1)
@@ -657,7 +661,7 @@ bool Game::useOrThrowBackpack(int backpackIndex)
 	item[2] = subwin(item[0], 1, 5, 5, 39);
 	waddstr(item[1], "Use");
 	waddstr(item[2], "Throw");
-	
+
 	wrefresh(item[0]);
 	int selected = 0;
 	bool canUse = true;
@@ -665,7 +669,7 @@ bool Game::useOrThrowBackpack(int backpackIndex)
 	if (\
 		playerItem->getItemType() == ItemType::weapons || \
 		(playerItem->getItemType() == ItemType::key && dynamic_cast<Key*>(playerItem)->used)\
-	)
+		)
 	{
 		wbkgd(item[1], COLOR_INVALID);
 		wnoutrefresh(item[1]);
@@ -823,7 +827,7 @@ void Game::useItem(int backpackIndex)
 			addInfo("Arrive at your destination.");
 			globalMainMap->SetMapLocation(x + direction[0] * key->step, y + direction[1] * key->step);
 		}
-		globalMap=globalMainMap-> GetCurrentMap();
+		globalMap = globalMainMap->GetCurrentMap();
 		key->useIt();
 	}
 }
@@ -837,7 +841,7 @@ Directions Game::scrollDirections(bool* directionsEnable)
 	direction[static_cast<int>(Directions::left)] = subwin(directionsWin, 1, 2, 5, 40);
 	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
 	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
-	
+
 	waddwstr(direction[static_cast<int>(Directions::up)], L"↑");
 	waddwstr(direction[static_cast<int>(Directions::down)], L"↓");
 	waddwstr(direction[static_cast<int>(Directions::left)], L"←");
@@ -954,7 +958,7 @@ void Game::addInfo(const char* message)
 	{
 		messageStr += " ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i++)
+	for (size_t i = 0; i < messageStr.length() / 96; i++)
 	{
 		infoList[header++] = s2ws(messageStr.substr(i * 96, 96));
 		header %= 17;
@@ -974,7 +978,7 @@ void Game::addInfo(const wchar_t* message)
 	{
 		messageStr += L" ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i++)
+	for (size_t i = 0; i < messageStr.length() / 96; i++)
 	{
 		infoList[header++] = messageStr.substr(i * 96, 96);
 		header %= 17;
@@ -1189,7 +1193,7 @@ void Game::conjoure()
 	}
 	auto conjoureDirec = scrollDirections(directions);
 	if (conjoureDirec == Directions::win) return;
-	auto status=player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+	auto status = player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
 	if (status)
 		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1], false);
 }
@@ -1212,13 +1216,13 @@ void Game::pickup()
 	}
 	auto itemDirec = scrollDirections(directions);
 	if (itemDirec == Directions::win) return;
-	auto status = player->pick( 
-		dynamic_cast<Item*>( 										\
-			globalMap->getLocationItem( 							\
+	auto status = player->pick(
+		dynamic_cast<Item*>(\
+			globalMap->getLocationItem(\
 				x + directionTable[static_cast<int>(itemDirec)][0], \
 				y + directionTable[static_cast<int>(itemDirec)][1]  \
 			) 														\
-		) 															\
+			) 															\
 	);
 	if (status)
 		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1], false);
@@ -1231,4 +1235,26 @@ void Game::gotoWin()
 	addInfo("**************************");
 	addInfo("Press any key to end the game.");
 	getch();
+}
+
+void Game::attack()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::creature) {
+					if (direction[0] == 0)
+						directions[direction[1] == 1 ? 0 : 1] = true;
+					else
+						directions[direction[0] == -1 ? 2 : 3] = true;
+				}
+			}
+		}
+	}
+	auto attackDirec = scrollDirections(directions);
+	if (attackDirec == Directions::win) return;
+	player->attack(*globalMap->getLocationCreature(x + directionTable[static_cast<int>(attackDirec)][0], y + directionTable[static_cast<int>(attackDirec)][1]));
 }

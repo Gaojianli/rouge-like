@@ -52,6 +52,7 @@ private:
 	void pickup();
 	void printHelp();
 	void investigate();
+	void attack();
 public:
 	Map* globalMap;
 	std::list<Creature*> characters;
