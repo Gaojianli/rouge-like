@@ -500,10 +500,10 @@ Directions Game::scrollDirections(bool *directionsEnable)
 	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
 	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
 
-	waddwstr(direction[static_cast<int>(Directions::up)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::down)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::left)], L"��");
-	waddwstr(direction[static_cast<int>(Directions::right)], L"��");
+	waddwstr(direction[static_cast<int>(Directions::up)], L"↑");
+	waddwstr(direction[static_cast<int>(Directions::down)], L"↓");
+	waddwstr(direction[static_cast<int>(Directions::left)], L"←");
+	waddwstr(direction[static_cast<int>(Directions::right)], L"→");
 	Directions selected = Directions::win;
 	for (auto i : {Directions::up, Directions::down, Directions::left, Directions::right})
 		if (!directionsEnable[static_cast<int>(i)])

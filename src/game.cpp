@@ -533,6 +533,7 @@ void Game::nextRound()
 				monsterChar->beControlled--;
 				if (monsterChar->beControlled == 0) {
 					player->follower.erase(std::find(player->follower.begin(), player->follower.end(), monsterChar));
+					addInfo((monsterChar->name + " is out of your control.").c_str());
 					globalMap->randomSetThings(monsterChar);
 				}
 			}
