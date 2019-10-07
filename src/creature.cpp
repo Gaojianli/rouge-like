@@ -21,6 +21,7 @@ void Creature::died()
 bool Creature::attack(Creature &beAttack)
 {
 	beAttack.beAttacked = true;
+	beAttack.attitude = attitudes::agressive;
 	//calculate attack sum
 	int attackSum = this->getAttack();
 	//calculate defends sum
