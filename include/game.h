@@ -30,6 +30,7 @@ private:
 	std::wstring infoList[17];
 	int header = 0;
 	bool wined = false;
+	unsigned roundNumber = 1;
 	MainMap mainmap;
 	void drawMain();
 	void drawMap();
@@ -48,11 +49,11 @@ private:
 	bool isAround(ObjectType target);
 	bool canControlAround();
 	void nextRound();
-	void conjoure();
+	bool conjoure();
 	void pickup();
 	void printHelp();
 	void investigate();
-	void attack();
+	bool attack();
 public:
 	Map* globalMap;
 	std::list<Creature*> characters;

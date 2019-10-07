@@ -180,10 +180,10 @@ inputName:
 		{
 			string toInsert = "*";
 			toInsert += roles[i];
-			mvprintw(5 + i, COLS / 2 - 21, toInsert.c_str()); //default select
+			mvprintw(6 + i, COLS / 2 - 16, toInsert.c_str()); //default select
 		}
 		else
-			mvprintw(5 + i, COLS / 2 - 20, roles[i].c_str());
+			mvprintw(6 + i, COLS / 2 - 15, roles[i].c_str());
 	}
 	int ch;
 	int postion = 0;
@@ -197,23 +197,23 @@ inputName:
 		switch (ch)
 		{
 		case KEY_UP:
-			move(5 + postion, 0);
+			move(6 + postion, 0);
 			clrtoeol();
-			mvprintw(5 + postion, COLS / 2 - 20, roles[postion].c_str());
+			mvprintw(6 + postion, COLS / 2 - 15, roles[postion].c_str());
 			if (postion != 0)
 				postion--;
 			toInsert += roles[postion];
-			mvprintw(5 + postion, COLS / 2 - 21, toInsert.c_str());
+			mvprintw(6 + postion, COLS / 2 - 16, toInsert.c_str());
 			refresh();
 			break;
 		case KEY_DOWN:
-			move(5 + postion, 0);
+			move(6 + postion, 0);
 			clrtoeol();
-			mvprintw(5 + postion, COLS / 2 - 20, roles[postion].c_str());
+			mvprintw(6 + postion, COLS / 2 - 15, roles[postion].c_str());
 			if (postion != 6)
 				postion++;
 			toInsert += roles[postion];
-			mvprintw(5 + postion, COLS / 2 - 21, toInsert.c_str());
+			mvprintw(6 + postion, COLS / 2 - 16, toInsert.c_str());
 			refresh();
 			break;
 		case 13: //enter
@@ -233,6 +233,7 @@ inputName:
 	WINDOW** menu = nullptr;
 	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
+	unsigned lastAttackRoundNumber = 0;
 	while (!wined)
 	{
 		drawMap();
@@ -247,16 +248,16 @@ inputName:
 		{
 		case 'M':
 		case 'm':
-			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
+			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature) && (lastAttackRoundNumber != roundNumber);
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
-			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
-			menuEnable[static_cast<int>(MenuType::Investigate)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround() && (lastAttackRoundNumber != roundNumber);
+			menuEnable[static_cast<int>(MenuType::Investigate)] = (isAround(ObjectType::creature) || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menuEnable[static_cast<int>(MenuType::Backpack)] = !player->backpack.empty();
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
 			case MenuType::Attack:
-				attack();
+				if(attack()) lastAttackRoundNumber = roundNumber;
 				break;
 			case MenuType::Backpack:
 				drawBackPack();
@@ -270,7 +271,7 @@ inputName:
 				investigate();
 				break;
 			case MenuType::Control:
-				conjoure();
+				if(conjoure()) lastAttackRoundNumber = roundNumber;
 				break;
 			case MenuType::NextRound:
 				nextRound();
@@ -1062,7 +1063,7 @@ void Game::drawMap()
 void Game::nextRound()
 {
 	player->movePoints = 5;//reset move points
-
+	roundNumber++;
 	//regenerate bottles
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
 		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
@@ -1185,7 +1186,7 @@ void Game::investigate() {
 	}
 }
 
-void Game::conjoure()
+bool Game::conjoure()
 {
 	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
 	auto x = player->position.first, y = player->position.second;
@@ -1205,10 +1206,11 @@ void Game::conjoure()
 		}
 	}
 	auto conjoureDirec = scrollDirections(directions);
-	if (conjoureDirec == Directions::win) return;
+	if (conjoureDirec == Directions::win) return false;
 	auto status = player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
 	if (status)
 		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1], false);
+	return true;
 }
 void Game::pickup()
 {
@@ -1235,7 +1237,7 @@ void Game::pickup()
 				x + directionTable[static_cast<int>(itemDirec)][0], \
 				y + directionTable[static_cast<int>(itemDirec)][1]  \
 			) 														\
-			) 															\
+		)	 														\
 	);
 	if (status)
 		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1], false);
@@ -1250,7 +1252,7 @@ void Game::gotoWin()
 	getch();
 }
 
-void Game::attack()
+bool Game::attack()
 {
 	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
 	auto x = player->position.first, y = player->position.second;
@@ -1268,6 +1270,7 @@ void Game::attack()
 		}
 	}
 	auto attackDirec = scrollDirections(directions);
-	if (attackDirec == Directions::win) return;
+	if (attackDirec == Directions::win) return false;
 	player->attack(*globalMap->getLocationCreature(x + directionTable[static_cast<int>(attackDirec)][0], y + directionTable[static_cast<int>(attackDirec)][1]));
+	return true;
 }

@@ -25,48 +25,48 @@ Bottle::Bottle()
 		break;
 	}
 	default:
+		this->type = BottleType::bloodBottle;
+		this->increased = std::rand() % 20 + 20;
 		break;
 	}
 }
 
 bool Bottle::use(Creature* target)
 {
+	try
 	{
-		try
+
+		switch (this->type)
 		{
-			if (target->getType() == ObjectType::creature)
+		case BottleType::bloodBottle:
+			target->health += this->increased;
+			target->health = target->health > int(target->healthUpper) ? target->healthUpper : target->health;
+			return true;
+		case BottleType::manaBottle:
+			if (target->getCreatureType() == CreatureType::monster)
 			{
-				switch (this->type)
-				{
-				case BottleType::bloodBottle:
-					target->health += this->increased;
-					target->health = target->health > target->healthUpper ? target->healthUpper : target->health;
-					return true;
-				case BottleType::manaBottle:
-					if (target->getCreatureType() == CreatureType::monster)
-					{
-						return false;
-					}
-					else
-					{
-						auto mankind = dynamic_cast<Mankind*>(target);
-						mankind->mana += this->increased;
-						mankind->mana = mankind->mana > mankind->getManaUpper() ? mankind->getManaUpper() : mankind->mana;
-						return true;
-					}
-				case BottleType::poison:
-					target->bePoisoned += this->increased;
-					target->beAttacked = true;
-				default:
-					return false;
-				}
+				return false;
 			}
-		}
-		catch (std::exception& e)
-		{
-			game->addInfo(e.what());
+			else
+			{
+				auto mankind = dynamic_cast<Mankind*>(target);
+				mankind->mana += this->increased;
+				mankind->mana = mankind->mana > mankind->getManaUpper() ? mankind->getManaUpper() : mankind->mana;
+				return true;
+			}
+		case BottleType::poison:
+			target->bePoisoned += this->increased;
+			target->beAttacked = true;
+			return true;
+			break;
+		default:
 			return false;
 		}
+	}
+	catch (std::exception& e)
+	{
+		game->addInfo(e.what());
+		return false;
 	}
 }
 Bottle::Bottle(BottleType type, unsigned increased)
