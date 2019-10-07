@@ -811,6 +811,10 @@ void Game::useItem(int backpackIndex)
 			gotoWin();
 			return;
 		}
+		if (key->used) {
+			addInfo("This key has been used.");
+			return;
+		}
 		auto direction = directionTable[static_cast<int>(key->direction)];
 		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
 		if (globalMainMap->isOutOfRange(x + direction[0] * key->step, y + direction[1] * key->step)) {
@@ -1066,6 +1070,14 @@ void Game::nextRound()
 		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
 		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+
+	//reset keys
+	for (auto i : player->backpack) {
+		if (i->getItemType() == ItemType::bottle)
+			continue;
+		else
+			dynamic_cast<Key*>(i)->used = false;
+	}
 
 	for (auto& charac : characters)
 	{
