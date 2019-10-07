@@ -52,13 +52,15 @@ bool Mankind::conjure(Monster *object)
 	{ //enough mana
 		this->mana -= object->power;
 		object->beControlled = 5; //control 5 rounds
+		object->master = this;
+		follower.push_back(object);
 		return true;
 	}
 	else
 		return false;
 }
 
-const char *Mankind::getInfo()
+std::string Mankind::getInfo()
 {
 	const std::string roles[] = {
 		"magician",
@@ -74,8 +76,11 @@ const char *Mankind::getInfo()
 	std::string introduction = "A ";
 	introduction += roles[(int)role];
 	introduction += ". Which power is " + std::to_string(this->power);
-	introduction += ". Very " + (attitude == attitudes::agressive) ? "dangerous." : "friendly.";
-	return introduction.c_str();
+	introduction += ", Health is ";
+	introduction += std::to_string(this->health) + "/" + std::to_string(this->healthUpper);
+	introduction += ". Very ";
+	introduction += (attitude == attitudes::agressive) ? "agressive." : "friendly.";
+	return introduction;
 }
 
 int Mankind::getAttack()
@@ -83,9 +88,9 @@ int Mankind::getAttack()
 	int attackSum = power;
 	for (auto &i : backpack)
 	{
-		if (i.getItemType() == ItemType::weapons)
+		if (i->getItemType() == ItemType::weapons)
 		{
-			attackSum += static_cast<Weapons &>(i).attack;
+			attackSum += static_cast<Weapons *>(i)->attack;
 		}
 	}
 	return attackSum;
@@ -96,9 +101,9 @@ int Mankind::getDefense()
 	int defenseSum = power;
 	for (auto &i : backpack)
 	{
-		if (i.getItemType() == ItemType::weapons)
+		if (i->getItemType() == ItemType::weapons)
 		{
-			defenseSum += static_cast<Weapons &>(i).defense;
+			defenseSum += static_cast<Weapons *>(i)->defense;
 		}
 	}
 	return defenseSum;
@@ -124,7 +129,7 @@ bool Mankind::attack(Creature &beAttack)
 	return true;
 }
 
-bool Mankind::pick(Item &toPick)
+bool Mankind::pick(Item *toPick)
 {
 	if (backpack.size() <= 4) //backpack is full
 	{

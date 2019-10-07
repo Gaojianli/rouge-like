@@ -6,12 +6,12 @@ MainMap::MainMap()
 	for (int i = 0; i < mapSize; i++)
 	{
 		std::vector<Map> thisLine;
-		for (int j = 0; j < mapSize; j++) // i for x, j for y
+		for (int j = 0; j < mapSize; j++) // i for y, j for x
 		{
 			Map oneMap;
 			if (0 == i)
 			{
-				oneMap.setDisabledGate(2);
+				oneMap.setDisabledGate(1);
 				if (0 == j)
 				{
 					oneMap.setPortal(3);
@@ -23,7 +23,7 @@ MainMap::MainMap()
 			}
 			else if ((mapSize - 1) == i)
 			{
-				oneMap.setDisabledGate(3);
+				oneMap.setDisabledGate(0);
 				if ((mapSize - 1) == j)
 				{
 					oneMap.setPortal(2);
@@ -35,11 +35,11 @@ MainMap::MainMap()
 			}
 			if (0 == j)
 			{
-				oneMap.setDisabledGate(1);
+				oneMap.setDisabledGate(2);
 			}
-			if ((mapSize - 1) == j)
+			else if ((mapSize - 1) == j)
 			{
-				oneMap.setDisabledGate(0);
+				oneMap.setDisabledGate(3);
 			}
 			thisLine.push_back(oneMap);
 		}

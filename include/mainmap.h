@@ -1,7 +1,7 @@
 //MainMap.h
 
 #pragma once
-constexpr int mapSize = 4;
+constexpr int mapSize = 4;//4 * 4=16 maps
 #include <iostream>
 #include <vector>
 #include <string>
@@ -22,11 +22,11 @@ public:
 	bool isOutOfRange(int x, int y);
 	int GetMapXLocation();
 	int GetMapYLocation();
-	Map &GetMapAt(int x, int y)
+	Map*GetMapAt(int x, int y)
 	{
-		return ((maps[x])[y]);
+		return &((maps[y])[x]);
 	}
-	Map& GetCurrentMap() {
+	Map* GetCurrentMap() {
 		return GetMapAt(mainmap_x, mainmap_y);
 	}
 };

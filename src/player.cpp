@@ -34,7 +34,7 @@ bool Player::move(MoveDirection direction)
 	{ //detect door
 		if (newY == 4)
 		{ //door
-			if (gates[newX > 8 ? 2 : 3])
+			if (gates[newX > 8 ? 3 : 2] || game->globalMap->getPortal() != 0)
 			{
 				position = { newX > 8 ? 0 : 8, newY }; //new position in new door
 				movePoints--;
@@ -47,7 +47,7 @@ bool Player::move(MoveDirection direction)
 	{
 		if (newX == 4)
 		{
-			if (gates[newY > 8 ? 0 : 1])
+			if (gates[newY > 8 ? 0 : 1] || game->globalMap->getPortal() != 0)
 			{
 				position = { newX, newY > 8 ? 0 : 8 };
 				movePoints--;
@@ -68,7 +68,7 @@ bool Player::move(MoveDirection direction)
 	}
 }
 
-const char* Player::getInfo()
+std::string Player::getInfo()
 {
 	return "Player";
 }

@@ -4,11 +4,11 @@
 #include "mankind.h"
 #include "mainmap.h"
 #include "weapons.h"
-#include "key.h"
 #include "curses/curses.h"
 #include <cmath>
 #include <functional>
-#include <comutil.h>  
+#include <comutil.h>
+#include <time.h>
 using std::string;
 string ws2s(const std::wstring& ws) {
 	_bstr_t t = ws.c_str();
@@ -39,6 +39,8 @@ void Game::init()
 	curs_set(0);
 	raw();
 	noecho();
+	// Set time based random seed
+	std::srand(unsigned(time(nullptr)));
 	// Generate items
 	std::vector<gameObject*> itemToDistribute;
 	for (int i = 0; i < std::rand() % 8 + 16; i++) // Add bottle to item list
@@ -75,51 +77,68 @@ void Game::init()
 		{
 		case 0:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Slime" + std::to_string(l)).c_str(), MonsterType::slime, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 1:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Skeleton" + std::to_string(l)).c_str(), MonsterType::skeleton, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 2:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Dragon" + std::to_string(l)).c_str(), MonsterType::dragon, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 3:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Snake" + std::to_string(l)).c_str(), MonsterType::snake, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		case 4:
 		{
-			itemToDistribute.push_back(new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2)));
+			Monster* m = new Monster({ 0, 0 }, ("Tarrasque" + std::to_string(l)).c_str(), MonsterType::tarrasque, static_cast<attitudes>(std::rand() % 2));
+			itemToDistribute.push_back(m);
+			characters.push_back(m);
 			break;
 		}
 		default:
 			break;
 		}
-		// Init Maps.
-		globalMainMap = std::make_shared<MainMap>(MainMap());
-		// Roll Map.
-		globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
-		globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+	}
+	const std::string roles[] = {
+		"magician",
+		"wizard",
+		"warrior",
+		"harpy",
+		"amazon",
+		"dwarf",
+		"monkey" };
+	for (int m = 0; m < 3; m++) // Generate three human NPC
+	{
+		int role = std::rand() % 7;
+		Mankind* p = new Mankind({ 0, 0 }, (roles[role] + std::to_string(m)).c_str(), static_cast<Role>(role), static_cast<attitudes>(std::rand() % 2));
+		itemToDistribute.push_back(p);
+		characters.push_back(p);
+	}
+	// Init Maps.
+	globalMainMap = std::make_shared<MainMap>(MainMap());
+	// Roll Map.
+	globalMainMap->SetMapLocation(std::rand() % 4, std::rand() % 4);// Roll first rom
+	globalMap = globalMainMap->GetCurrentMap();
 
-		// Send Items to Map
+	// Send Items to Map
 
-		for (auto i : itemToDistribute) {
-			(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4)).randomSetThings(i);
-		}
-		/* // Test line
-		auto item = std::vector<gameObject*>{
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-			new Bottle(BottleType::bloodBottle, 10),
-		};
-		globalMap->distributeThings(item);
-		*/
+	for (auto i : itemToDistribute) {
+		(globalMainMap->GetMapAt(std::rand() % 4, std::rand() % 4))->randomSetThings(i);
 	}
 }
 
@@ -204,7 +223,7 @@ inputName:
 			break;
 		}
 	}
-	player = std::make_shared<Player>(Player({ rand()%9, rand()%9 }, name, static_cast<Role>(postion)));
+	player = std::make_shared<Player>(Player({ rand() % 9, rand() % 9 }, name, static_cast<Role>(postion)));
 	delete[] name;
 	move(2, 0);
 	clrtobot();
@@ -214,7 +233,7 @@ inputName:
 	WINDOW** menu = nullptr;
 	bool menuEnable[8] = { true,true,true,true,true,true,true,true };
 	bool moveStatus = true;
-	while (true)
+	while (!wined)
 	{
 		drawMap();
 		drawPlayer();
@@ -222,6 +241,7 @@ inputName:
 		drawBackPack();
 		moveStatus = false;
 		auto oldPosition = player->position;
+		int backpackScroll = -1;
 		ch = getch();
 		switch (ch)
 		{
@@ -230,10 +250,28 @@ inputName:
 			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature);
 			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
 			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround();
-			menuEnable[static_cast<int>(MenuType::Investigation)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Investigate)] = (menuEnable[static_cast<int>(MenuType::Attack)] || menuEnable[static_cast<int>(MenuType::PickUp)]);
+			menuEnable[static_cast<int>(MenuType::Backpack)] = !player->backpack.empty();
 			menu = drawMenu(menuEnable);
 			switch (scrollMenu(menu, 8, menuEnable))
 			{
+			case MenuType::Attack:
+				attack();
+				break;
+			case MenuType::Backpack:
+				drawBackPack();
+				backpackScroll = scrollBackpack();
+				if (backpackScroll != -1) useOrThrowBackpack(backpackScroll);
+				break;
+			case MenuType::PickUp:
+				pickup();
+				break;
+			case MenuType::Investigate:
+				investigate();
+				break;
+			case MenuType::Control:
+				conjoure();
+				break;
 			case MenuType::NextRound:
 				nextRound();
 				drawMap();
@@ -275,14 +313,26 @@ inputName:
 					// right
 					if (!globalMainMap->isOutOfRange(x + 1, y)) {
 						globalMainMap->SetMapLocation(x + 1, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You enter the room on the right.");
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x - 3, y)) {
+						globalMainMap->SetMapLocation(x - 3, y);
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You pass through the portal to the far left of the map.");
 					}
 				}
 				else {
 					// left
 					if (!globalMainMap->isOutOfRange(x - 1, y)) {
 						globalMainMap->SetMapLocation(x - 1, y);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You enter the room on the left.");
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x + 3, y)) {
+						globalMainMap->SetMapLocation(x + 3, y);
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You pass through the portal to the far right of the map.");
 					}
 				}
 			}
@@ -291,22 +341,128 @@ inputName:
 					// up
 					if (!globalMainMap->isOutOfRange(x, y + 1)) {
 						globalMainMap->SetMapLocation(x, y + 1);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You enter the room on the up.");
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y - 3)) {
+						globalMainMap->SetMapLocation(x, y - 3);
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You pass through the portal to the far down of the map.");
 					}
 				}
 				else {
 					// down
 					if (!globalMainMap->isOutOfRange(x, y - 1)) {
 						globalMainMap->SetMapLocation(x, y - 1);
-						globalMap = std::make_shared<Map>(globalMainMap->GetCurrentMap());
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You enter the room on the down.");
+					}
+					else if (globalMap->getPortal() > 0 && !globalMainMap->isOutOfRange(x, y + 3)) {
+						globalMainMap->SetMapLocation(x, y + 3);
+						globalMap = globalMainMap->GetCurrentMap();
+						addInfo("You pass through the portal to the far up of the map.");
 					}
 				}
 			}
 		}
-
 	}
 }
-
+void showItemInWin(WINDOW* win, Item* item) {
+	if (item == nullptr) {
+		mvwaddstr(win, 0, 0, "       ");
+		mvwaddstr(win, 1, 0, " Empty ");
+		mvwaddstr(win, 2, 0, "       ");
+		mvwaddstr(win, 3, 0, "       ");
+		return;
+	}
+	switch (item->getItemType())
+	{
+	case ItemType::bottle:
+		switch (dynamic_cast<Bottle*>(item)->type)
+		{
+		case BottleType::bloodBottle:
+			mvwaddstr(win, 0, 0, "Blood  ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "HP: %d", dynamic_cast<Bottle*>(item)->increased);
+		case BottleType::manaBottle:
+			mvwaddstr(win, 0, 0, "Mana   ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "MP: %d", dynamic_cast<Bottle*>(item)->increased);
+		case BottleType::poison:
+			mvwaddstr(win, 0, 0, "Poison ");
+			mvwaddstr(win, 1, 0, " Bottle");
+			mvwaddstr(win, 2, 0, "       ");
+			mvwprintw(win, 3, 0, "R: %d", dynamic_cast<Bottle*>(item)->increased);
+		default:
+			break;
+		}
+		break;
+	case ItemType::key:
+		switch (dynamic_cast<Key*>(item)->direction)
+		{
+		case Directions::up:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, "   up  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::down:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " down  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::left:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " left  ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::right:
+			mvwaddstr(win, 0, 0, "Key to ");
+			mvwaddstr(win, 1, 0, " right ");
+			mvwprintw(win, 2, 0, "step: %d", dynamic_cast<Key*>(item)->step);
+			mvwprintw(win, 3, 0, "Used: %s", dynamic_cast<Key*>(item)->used ? "Y" : "N");
+			break;
+		case Directions::win:
+			mvwaddstr(win, 0, 0, "       ");
+			mvwaddstr(win, 1, 0, "Key to ");
+			mvwaddstr(win, 2, 0, "  WIN  ");
+			mvwaddstr(win, 3, 0, "       ");
+			break;
+		default:
+			break;
+		}
+		break;
+	case ItemType::weapons:
+		switch (dynamic_cast<Weapons*>(item)->type)
+		{
+		case WeaponsType::cane:
+			mvwaddstr(win, 0, 0, "  Cane ");
+			break;
+		case WeaponsType::shield:
+			mvwaddstr(win, 0, 0, "Shield ");
+			break;
+		case WeaponsType::sword:
+			mvwaddstr(win, 0, 0, " Sword ");
+			break;
+		default:
+			break;
+		}
+		mvwprintw(win, 1, 0, "ATK:%d", dynamic_cast<Weapons*>(item)->attack);
+		mvwprintw(win, 2, 0, "DEF:%d", dynamic_cast<Weapons*>(item)->defense);
+		mvwprintw(win, 3, 0, "MP :%d", dynamic_cast<Weapons*>(item)->mana);
+		break;
+	default:
+		break;
+	}
+}
+/*
+	1 2
+	3 4
+*/
 void Game::drawBackPack()
 {
 	if (backpackWin != nullptr) {
@@ -325,22 +481,10 @@ void Game::drawBackPack()
 	backpackWin[7] = subwin(backpackWin[3], 4, 7, 8, 66);
 	backpackWin[8] = subwin(backpackWin[4], 4, 7, 8, 74);
 	for (auto i : { 1,2,3,4 }) wborder(backpackWin[i], '|', '|', '-', '-', '+', '+', '+', '+');
-	
+	int count = 0;
+	for (auto i : player->backpack) showItemInWin(backpackWin[5 + (count++)], i);
+	for (; count < 4; count++) showItemInWin(backpackWin[5 + count], nullptr);
 	wrefresh(backpackWin[0]);
-}
-void showItemInWin(WINDOW *win, Item &item) {
-	switch (item.getItemType())
-	{
-	case ItemType::bottle:
-		mvwaddstr(win, 0, 0,"");
-		break;
-	case ItemType::key:
-		break;
-	case ItemType::weapons:
-		break;
-	default:
-		break;
-	}
 }
 /*
 	name: name
@@ -388,7 +532,7 @@ void Game::drawPlayer()
 }
 
 /*
-	Investigation
+	Investigate
 	Attack
 	Control
 	Pick up
@@ -399,9 +543,9 @@ void Game::drawPlayer()
 WINDOW** Game::drawMenu(bool* menuEnable)
 {
 	const char* muneStr[]{
-		"Investigation",
+		"Investigate",
 		"Attack",
-		"Control",
+		"Conjure",
 		"Pick up",
 		"Backpack",
 		"Next round",
@@ -467,7 +611,282 @@ MenuType Game::scrollMenu(WINDOW** items, int count, bool* menuEnable)
 		}
 	}
 }
+int Game::scrollBackpack()
+{
+	int key;
+	int selected = 0;
+	size_t count = player->backpack.size();
+	wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
+	wnoutrefresh(backpackWin[selected + 5]);
+	while (1)
+	{
+		key = getch();
+		if (key == KEY_DOWN || key == KEY_UP || key == KEY_LEFT || key == KEY_RIGHT)
+		{
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			wnoutrefresh(backpackWin[selected + 5]);
+			if (key == KEY_DOWN || key == KEY_UP)
+			{
+				selected = (selected + 2) % 4 < count ? (selected + 2) % 4 : selected;
+			}
+			else if (key == KEY_LEFT)
+			{
+				selected = (selected + 3) % 4 < count ? (selected + 3) % 4 : selected;
+			}
+			else
+			{
+				selected = (selected + 1) % 4 < count ? (selected + 1) % 4 : selected;
+			}
+			wbkgd(backpackWin[selected + 5], COLOR_SELECTED);
+			wnoutrefresh(backpackWin[selected + 5]);
+			doupdate();
+		}
+		else if (key == 13)
+		{
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			return selected;
+		}
+		else {
+			wbkgd(backpackWin[selected + 5], COLOR_NORMAL);
+			return -1;
+		}
+	}
+}
+bool Game::useOrThrowBackpack(int backpackIndex)
+{
+	auto item = new WINDOW * [3];
+	item[0] = newwin(4, 7, 3, 38);
+	wborder(item[0], '|', '|', '-', '-', '+', '+', '+', '+');
+	item[1] = subwin(item[0], 1, 5, 4, 39);
+	item[2] = subwin(item[0], 1, 5, 5, 39);
+	waddstr(item[1], "Use");
+	waddstr(item[2], "Throw");
 
+	wrefresh(item[0]);
+	int selected = 0;
+	bool canUse = true;
+	auto playerItem = player->backpack[backpackIndex];
+	if (\
+		playerItem->getItemType() == ItemType::weapons || \
+		(playerItem->getItemType() == ItemType::key && dynamic_cast<Key*>(playerItem)->used)\
+		)
+	{
+		wbkgd(item[1], COLOR_INVALID);
+		wnoutrefresh(item[1]);
+		wbkgd(item[2], COLOR_SELECTED);
+		wnoutrefresh(item[2]);
+		canUse = false;
+		selected = 1;
+	}
+	else {
+		wbkgd(item[1], COLOR_SELECTED);
+		wnoutrefresh(item[1]);
+	}
+	int key;
+	while (true) {
+		key = getch();
+		switch (key)
+		{
+		case KEY_UP:
+		case KEY_DOWN:
+			wbkgd(item[selected + 1], COLOR_NORMAL);
+			wnoutrefresh(item[selected + 1]);
+			if (canUse) {
+				selected = (selected + 1) % 2;
+			}
+			wbkgd(item[selected + 1], COLOR_SELECTED);
+			wnoutrefresh(item[selected + 1]);
+			doupdate();
+			break;
+		case 13:
+			deleteMenu(item, 3);
+			if (selected == 0) {
+				useItem(backpackIndex);
+			}
+			else {
+				throwItem(backpackIndex);
+			}
+			drawBackPack();
+			return true;
+		default:
+			deleteMenu(item, 3);
+			return false;
+		}
+	}
+}
+void Game::throwItem(int backpackIndex)
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto item = player->backpack[backpackIndex];
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType == ObjectType::nothing) {
+				if (direction[0] == 0)
+					directions[direction[1] == 1 ? 0 : 1] = true;
+				else
+					directions[direction[0] == -1 ? 2 : 3] = true;
+			}
+		}
+	}
+	addInfo("If you want to throw something away, choose a direction.");
+	Directions selected;
+	if ((selected = scrollDirections(directions)) == Directions::win) {
+		addInfo("You choose to cancel.");
+		return;
+	}
+	auto direction = directionTable[static_cast<int>(selected)];
+	auto it = player->backpack.begin() + backpackIndex;
+	player->backpack.erase(it);
+	globalMap->setGameObjectat(x + direction[0], y + direction[1], item);
+	addInfo("You threw it on the ground.");
+}
+void Game::useItem(int backpackIndex)
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto item = player->backpack[backpackIndex];
+	if (item->getItemType() == ItemType::bottle) {
+		auto bottle = dynamic_cast<Bottle*>(item);
+		if (bottle->type == BottleType::bloodBottle) {
+			player->health = player->health + bottle->increased > player->healthUpper ? \
+				player->healthUpper : player->health + bottle->increased;
+			addInfo("Used blood bottle. HP up!");
+		}
+		else if (bottle->type == BottleType::manaBottle) {
+			player->mana = player->mana + bottle->increased > player->manaUpper ? \
+				player->manaUpper : player->mana + bottle->increased;
+			addInfo("Used mana bottle. MP up!");
+		}
+		else {
+			addInfo("If you want to use poison, select the direction first.");
+			Directions selected;
+			auto x = player->position.first, y = player->position.second;
+			bool directions[4] = { false };
+			for (auto direction : directionTable) {
+				if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+					if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+						if (objectType == ObjectType::creature) {
+							auto creatureObject = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+							if (auto monsterObj = dynamic_cast<Monster*>(creatureObject); monsterObj != nullptr) {
+								if (monsterObj->beControlled != 0) {
+									if (direction[0] == 0)
+										directions[direction[1] == 1 ? 0 : 1] = true;
+									else
+										directions[direction[0] == -1 ? 2 : 3] = true;
+								}
+							}
+						}
+					}
+				}
+			}
+			if ((selected = scrollDirections(directions)) == Directions::win) {
+				addInfo("You choose to cancel use.");
+				return;
+			}
+			auto direction = directionTable[static_cast<int>(selected)];
+			auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1]));
+			monsterObj->attitude = attitudes::agressive;
+			monsterObj->bePoisoned += bottle->increased;
+			addInfo("The monster was poisoned.");
+		}
+		auto it = player->backpack.begin() + backpackIndex;
+		player->backpack.erase(it);
+		delete item;
+	}
+	else { // key
+		auto key = dynamic_cast<Key*>(item);
+		if (key->direction == Directions::win) {
+			gotoWin();
+			return;
+		}
+		auto direction = directionTable[static_cast<int>(key->direction)];
+		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
+		if (globalMainMap->isOutOfRange(x + direction[0] * key->step, y + direction[1] * key->step)) {
+			addInfo("Destination beyond map boundary, player will move to boundary.");
+			switch (key->direction)
+			{
+			case Directions::up:
+				globalMainMap->SetMapLocation(x, 3);
+				break;
+			case Directions::down:
+				globalMainMap->SetMapLocation(x, 0);
+				break;
+			case Directions::left:
+				globalMainMap->SetMapLocation(0, y);
+				break;
+			case Directions::right:
+				globalMainMap->SetMapLocation(3, y);
+				break;
+			default:
+				break;
+			}
+		}
+		else
+		{
+			addInfo("Arrive at your destination.");
+			globalMainMap->SetMapLocation(x + direction[0] * key->step, y + direction[1] * key->step);
+		}
+		globalMap = globalMainMap->GetCurrentMap();
+		key->useIt();
+	}
+}
+Directions Game::scrollDirections(bool* directionsEnable)
+{
+	auto directionsWin = newwin(5, 10, 3, 38);
+	auto direction = new WINDOW * [5];
+	wborder(directionsWin, '|', '|', '-', '-', '+', '+', '+', '+');
+	direction[static_cast<int>(Directions::up)] = subwin(directionsWin, 1, 2, 4, 42);
+	direction[static_cast<int>(Directions::down)] = subwin(directionsWin, 1, 2, 6, 42);
+	direction[static_cast<int>(Directions::left)] = subwin(directionsWin, 1, 2, 5, 40);
+	direction[static_cast<int>(Directions::right)] = subwin(directionsWin, 1, 2, 5, 44);
+	direction[static_cast<int>(Directions::win)] = subwin(directionsWin, 1, 2, 5, 42);
+
+	waddwstr(direction[static_cast<int>(Directions::up)], L"↑");
+	waddwstr(direction[static_cast<int>(Directions::down)], L"↓");
+	waddwstr(direction[static_cast<int>(Directions::left)], L"←");
+	waddwstr(direction[static_cast<int>(Directions::right)], L"→");
+	Directions selected = Directions::win;
+	for (auto i : { Directions::up , Directions::down, Directions::left, Directions::right })
+		if (!directionsEnable[static_cast<int>(i)]) wbkgd(direction[static_cast<int>(i)], COLOR_INVALID);
+	wbkgd(direction[static_cast<int>(Directions::win)], COLOR_SELECTED);
+	wrefresh(directionsWin);
+	int key;
+	while (true) {
+		key = getch();
+		if (key == KEY_DOWN || key == KEY_UP || key == KEY_LEFT || key == KEY_RIGHT)
+		{
+			wbkgd(direction[static_cast<int>(selected)], COLOR_NORMAL);
+			wnoutrefresh(direction[static_cast<int>(selected)]);
+			switch (key) {
+			case KEY_UP:
+				selected = directionsEnable[static_cast<int>(Directions::up)] ? Directions::up : selected;
+				break;
+			case KEY_DOWN:
+				selected = directionsEnable[static_cast<int>(Directions::down)] ? Directions::down : selected;
+				break;
+			case KEY_LEFT:
+				selected = directionsEnable[static_cast<int>(Directions::left)] ? Directions::left : selected;
+				break;
+			case KEY_RIGHT:
+				selected = directionsEnable[static_cast<int>(Directions::right)] ? Directions::right : selected;
+				break;
+			}
+			wbkgd(direction[static_cast<int>(selected)], COLOR_SELECTED);
+			wnoutrefresh(direction[static_cast<int>(selected)]);
+			doupdate();
+		}
+		else if (key == 13)
+		{
+			deleteMenu(direction, 5);
+			return selected;
+		}
+		else {
+			deleteMenu(direction, 5);
+			return Directions::win;
+		}
+	}
+}
 void Game::deleteMenu(WINDOW** items, int count)
 {
 	int i;
@@ -497,31 +916,31 @@ void Game::drawMain()
 	refresh();
 }
 
-bool isAround_(std::shared_ptr<Map> globalMap, std::shared_ptr<Player> player, std::function<void(int, int, bool&)> pf) {
+template<typename Callback>
+bool _isAround(Map* globalMap, std::shared_ptr<Player> player, Callback _callback) {
 	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
 	auto playerPosition = player->position;
 	auto x = playerPosition.first, y = playerPosition.second;
 	auto flag = false;
 	for (auto direction : directionTable) {
 		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
-			pf(x + direction[0], y + direction[1], flag);
-
+			_callback(x + direction[0], y + direction[1], flag);
 		}
 	}
 	return flag;
 }
 
 bool Game::isAround(ObjectType target) {
-	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == target) {
 			flag = true;
 		}
-	});
+		});
 }
 
 bool Game::canControlAround()
 {
-	return isAround_(globalMap, player, [&](int x, int y, bool& flag) {
+	return _isAround(globalMap, player, [&](int x, int y, bool& flag) {
 		if (globalMap->getLocationType(x, y) == ObjectType::creature) {
 			auto creature = globalMap->getLocationCreature(x, y);
 			auto monster = dynamic_cast<Monster*>(creature);
@@ -529,7 +948,7 @@ bool Game::canControlAround()
 				flag = true;
 			}
 		}
-	});
+		});
 }
 
 void Game::addInfo(const char* message)
@@ -539,7 +958,7 @@ void Game::addInfo(const char* message)
 	{
 		messageStr += " ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i++)
+	for (size_t i = 0; i < messageStr.length() / 96; i++)
 	{
 		infoList[header++] = s2ws(messageStr.substr(i * 96, 96));
 		header %= 17;
@@ -559,7 +978,7 @@ void Game::addInfo(const wchar_t* message)
 	{
 		messageStr += L" ";
 	}
-	for (int i = 0; i < messageStr.length() / 96; i++)
+	for (size_t i = 0; i < messageStr.length() / 96; i++)
 	{
 		infoList[header++] = messageStr.substr(i * 96, 96);
 		header %= 17;
@@ -574,6 +993,9 @@ void Game::addInfo(const wchar_t* message)
 
 void Game::drawMap()
 {
+	delwin(map);
+	map = subwin(stdscr, 11, 20, 2, 1);
+	wborder(map, '|', '|', '-', '-', '+', '+', '+', '+');
 	auto mapStr = globalMap->drawablemap();
 	auto gates = globalMap->getGates();
 	for (int i = 0; i < 9; i++)
@@ -581,25 +1003,45 @@ void Game::drawMap()
 		wmove(map, i + 1, 1);
 		waddstr(map, mapStr[i].c_str());
 	}
-	if (gates[0])
+	if (gates[0]) // up
 	{
 		wmove(map, 0, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[1])
+	if (gates[1]) // down
 	{
 		wmove(map, 10, 9);
 		waddstr(map, "nn");
 	}
-	if (gates[2])
+	if (gates[2]) // left
 	{
 		wmove(map, 5, 0);
 		waddstr(map, "n");
 	}
-	if (gates[3])
+	if (gates[3]) //right
 	{
 		wmove(map, 5, 19);
 		waddstr(map, "n");
+	}
+	auto portal = globalMap->getPortal();
+	if (portal > 0) {
+		auto x = globalMainMap->GetMapXLocation(), y = globalMainMap->GetMapYLocation();
+		if (x == 0 && y == 0) {
+			mvwaddstr(map, 5, 0, "X");
+			mvwaddstr(map, 10, 9, "XX");
+		}
+		else if (x == 0 && y == 3) {
+			mvwaddstr(map, 0, 9, "XX");
+			mvwaddstr(map, 5, 0, "X");
+		}
+		else if (x == 3 && y == 3) {
+			mvwaddstr(map, 0, 9, "XX");
+			mvwaddstr(map, 5, 19, "X");
+		}
+		else {
+			mvwaddstr(map, 10, 9, "XX");
+			mvwaddstr(map, 5, 19, "X");
+		}
 	}
 	wrefresh(map);
 }
@@ -610,17 +1052,12 @@ void Game::nextRound()
 
 	//regenerate bottles
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
-		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 	globalMainMap->GetMapAt(rand() % 4, rand() % 4)
-		.randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
+		->randomSetThings(new Bottle(static_cast<BottleType>(std::rand() % 3), 10));
 
 	for (auto& charac : characters)
 	{
-		for (int i = 4; i > 0; i--)
-		{
-			if (charac->move(static_cast<MoveDirection>(std::rand() % 4)))
-				i++; //move failed, try again;
-		}
 		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
 		{ //attack randomly
 		}
@@ -632,7 +1069,13 @@ void Game::nextRound()
 		if (auto monsterChar = dynamic_cast<Monster*>(charac); monsterChar != nullptr)
 		{
 			//if it is monster, rest controlled rounds decrease
-			monsterChar->beControlled--;
+			if (monsterChar->beControlled > 0) {
+				monsterChar->beControlled--;
+				if (monsterChar->beControlled == 0) {
+					player->follower.erase(std::find(player->follower.begin(), player->follower.end(), monsterChar));
+					globalMap->randomSetThings(monsterChar);
+				}
+			}
 		}
 	}
 	auto sameRoomCharacters = globalMap->getSameRoomObjectList(); //all objects in same room
@@ -650,8 +1093,13 @@ void Game::nextRound()
 				};
 				for (int i = 4; i > 0; i--)
 				{
-					if (creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
+					auto oldPostion = creatureObj->position;
+					if (!creatureObj->move(static_cast<MoveDirection>(std::rand() % 4)))
 						i++; //move failed, try again;
+					else {
+						globalMap->moveObject(oldPostion.first, oldPostion.second, creatureObj->position.first, creatureObj->position.second);
+					}
+
 				}
 				if (creatureObj->attitude == attitudes::agressive || creatureObj->beAttacked == true)
 				{ //attack randomly
@@ -661,27 +1109,27 @@ void Game::nextRound()
 					}
 				}
 				//NPC pick item
-				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr)
+				if (auto mankindObj = dynamic_cast<Mankind*>(creatureObj); mankindObj != nullptr && mankindObj->backpack.size() <= 4)
 				{
 					if (globalMap->getLocationType(creatureObj->position.first + 1, creatureObj->position.second) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
-						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second);
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first + 1, creatureObj->position.second));
+						globalMap->eraseGameObjectAt(creatureObj->position.first + 1, creatureObj->position.second, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first - 1, creatureObj->position.second) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
-						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second);
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first - 1, creatureObj->position.second));
+						globalMap->eraseGameObjectAt(creatureObj->position.first - 1, creatureObj->position.second, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second + 1) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
-						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1);
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second + 1));
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second + 1, false);
 					}
 					else if (globalMap->getLocationType(creatureObj->position.first, creatureObj->position.second - 1) == ObjectType::item)
 					{
-						mankindObj->pick(*globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
-						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1);
+						mankindObj->pick(globalMap->getLocationItem(creatureObj->position.first, creatureObj->position.second - 1));
+						globalMap->eraseGameObjectAt(creatureObj->position.first, creatureObj->position.second - 1, false);
 					}
 				}
 			}
@@ -692,12 +1140,121 @@ void Game::nextRound()
 void Game::printHelp()
 {
 	addInfo("Legends:");
-	addInfo("()   --Monster");
+	addInfo("()   --Mankind");
+	addInfo("{}   --Monster");
 	addInfo("<>   --Items");
 	addInfo("n/nn --Doors");
 	addInfo("/\\   --Player");
+	addInfo("X    --Magic tunnel");
 	addInfo(" ");
 	addInfo("Helps:");
 	addInfo("w/a/s/d --Move player");
 	addInfo("m       --Show/Hide menu");
+}
+
+void Game::investigate() {
+	const int directionTable[4][2] = { {1,0},{-1,0},{0,-1},{0,1} };
+	auto playerPosition = player->position;
+	auto x = playerPosition.first, y = playerPosition.second;
+	auto flag = false;
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				gameObject* toInvestigate;
+				if (objectType == ObjectType::creature)
+					toInvestigate = globalMap->getLocationCreature(x + direction[0], y + direction[1]);
+				else
+					toInvestigate = globalMap->getLocationItem(x + direction[0], y + direction[1]);
+				addInfo("Investigate result:");
+				addInfo(toInvestigate->getInfo().c_str());
+			}
+		}
+	}
+}
+
+void Game::conjoure()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::creature) {
+					if (auto monsterObj = dynamic_cast<Monster*>(globalMap->getLocationCreature(x + direction[0], y + direction[1])); monsterObj != nullptr) {
+						if (direction[0] == 0)
+							directions[direction[1] == 1 ? 0 : 1] = true;
+						else
+							directions[direction[0] == -1 ? 2 : 3] = true;
+					}
+				}
+			}
+		}
+	}
+	auto conjoureDirec = scrollDirections(directions);
+	if (conjoureDirec == Directions::win) return;
+	auto status = player->conjure(dynamic_cast<Monster*>(globalMap->getLocationCreature(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1])));
+	if (status)
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(conjoureDirec)][0], y + directionTable[static_cast<int>(conjoureDirec)][1], false);
+}
+void Game::pickup()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::item) {
+					if (direction[0] == 0)
+						directions[direction[1] == 1 ? 0 : 1] = true;
+					else
+						directions[direction[0] == -1 ? 2 : 3] = true;
+				}
+			}
+		}
+	}
+	auto itemDirec = scrollDirections(directions);
+	if (itemDirec == Directions::win) return;
+	auto status = player->pick(
+		dynamic_cast<Item*>(\
+			globalMap->getLocationItem(\
+				x + directionTable[static_cast<int>(itemDirec)][0], \
+				y + directionTable[static_cast<int>(itemDirec)][1]  \
+			) 														\
+			) 															\
+	);
+	if (status)
+		globalMap->eraseGameObjectAt(x + directionTable[static_cast<int>(itemDirec)][0], y + directionTable[static_cast<int>(itemDirec)][1], false);
+}
+void Game::gotoWin()
+{
+	wined = true;
+	addInfo("**************************");
+	addInfo("Congratulations on your success in finding the win key. You win the game.");
+	addInfo("**************************");
+	addInfo("Press any key to end the game.");
+	getch();
+}
+
+void Game::attack()
+{
+	const int directionTable[4][2] = { {0,1}, {0,-1}, {-1,0},{1,0} };
+	auto x = player->position.first, y = player->position.second;
+	bool directions[4] = { false };
+	for (auto direction : directionTable) {
+		if (!globalMap->isOutOfRange(x + direction[0], y + direction[1])) {
+			if (auto objectType = globalMap->getLocationType(x + direction[0], y + direction[1]); objectType != ObjectType::nothing) {
+				if (objectType == ObjectType::creature) {
+					if (direction[0] == 0)
+						directions[direction[1] == 1 ? 0 : 1] = true;
+					else
+						directions[direction[0] == -1 ? 2 : 3] = true;
+				}
+			}
+		}
+	}
+	auto attackDirec = scrollDirections(directions);
+	if (attackDirec == Directions::win) return;
+	player->attack(*globalMap->getLocationCreature(x + directionTable[static_cast<int>(attackDirec)][0], y + directionTable[static_cast<int>(attackDirec)][1]));
 }

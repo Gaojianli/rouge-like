@@ -75,7 +75,7 @@ bool *Map::getGates()
 }
 int Map::getPortal()
 {
-	return 0;
+	return portal_stat;
 	//return enable_portal;
 }
 std::vector<gameObject *> &Map::getSameRoomObjectList()
@@ -113,7 +113,7 @@ void Map::randomSetThings(gameObject* item) {
 			if (ObjectType::creature == item->getType())
 			{
 				Creature* cret = static_cast<Creature*>(item);
-				cret->setPosition(rand_y, rand_x);
+				cret->setPosition(rand_x, rand_y);
 			}
 			break;
 		}
@@ -121,11 +121,43 @@ void Map::randomSetThings(gameObject* item) {
 }
 void Map::eraseGameObjectAt(int x, int y)
 {
+	eraseGameObjectAt(x, y, true);
+}
+void Map::eraseGameObjectAt(int x, int y, bool freeMemory)
+{
 	if (nullptr == (mapcontent[y])[x])
 	{
 		objectlist.erase(std::find(objectlist.begin(), objectlist.end(), (mapcontent[y])[x]));
 	}
+	if(freeMemory) delete (mapcontent[y])[x];
 	(mapcontent[y])[x] = nullptr;
+}
+gameObject* Map::pickObjectAt(int x, int y) {
+	gameObject* src = (mapcontent[y])[x];
+	(mapcontent[y])[x] = nullptr;
+	objectlist.erase(std::find(objectlist.begin(), objectlist.end(), src));
+	return src;
+}
+Item* Map::pickItemAt(int x, int y) {
+	if (nullptr == (mapcontent[y])[x]) {
+		return nullptr;
+	}
+	else if (ObjectType::item != (mapcontent[y])[x]->getType()) {
+		return nullptr;
+	}
+	else
+	{
+		return static_cast<Item*>(pickObjectAt(x,y));
+	}
+}
+void Map::moveObject(int src_x, int src_y, int dst_x, int dst_y) {
+	if (nullptr != (mapcontent[dst_y])[dst_x]) return;
+	if(nullptr==(mapcontent[src_y])[src_x]) return;
+	(mapcontent[dst_y])[dst_x] = (mapcontent[src_y])[src_x];
+	(mapcontent[src_y])[src_x] = nullptr;
+	if (ObjectType::creature==(mapcontent[dst_y])[dst_x]->getType()) {
+		static_cast<Creature*>((mapcontent[dst_y])[dst_x])->setPosition(dst_x, dst_y);
+	}
 }
 std::vector<std::string> Map::drawablemap()
 {
@@ -179,6 +211,7 @@ bool Map::isOutOfRange(int x, int y)
 }
 ObjectType Map::getLocationType(int x, int y)
 {
+	if (isOutOfRange(x, y)) { return ObjectType::nothing; }
 	if (nullptr == (mapcontent[y])[x])
 	{
 		return ObjectType::nothing;

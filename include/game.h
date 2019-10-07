@@ -1,3 +1,4 @@
+#pragma once
 #include <list>
 #include <memory>
 #include <iostream>
@@ -6,10 +7,11 @@
 #include "map.h"
 #include "mainmap.h"
 #include "player.h"
+#include "key.h"
 
 enum class MenuType
 {
-	Investigation = 0,
+	Investigate = 0,
 	Attack,
 	Control,
 	PickUp,
@@ -23,11 +25,11 @@ enum class MenuType
 class Game
 {
 private:
-	std::list<Creature *> characters;
 	std::shared_ptr<Player> player;
 	WINDOW *menubar, *map, *info, *status, *playerWin, **backpackWin, *playerStatusWin;
 	std::wstring infoList[17];
 	int header = 0;
+	bool wined = false;
 	MainMap mainmap;
 	void drawMain();
 	void drawMap();
@@ -36,13 +38,24 @@ private:
 	void drawPlayer();
 	WINDOW** drawMenu(bool* menuEnable);
 	MenuType scrollMenu(WINDOW** items, int count, bool* menuEnable);
+	int scrollBackpack();
+	Directions scrollDirections(bool* directionsEnable);
+	bool useOrThrowBackpack(int backpackIndex);
+	void useItem(int backpackIndex);
+	void throwItem(int backpackIndex);
+	void gotoWin();
 	void deleteMenu(WINDOW** items, int count);
 	bool isAround(ObjectType target);
 	bool canControlAround();
 	void nextRound();
+	void conjoure();
+	void pickup();
 	void printHelp();
+	void investigate();
+	void attack();
 public:
-	std::shared_ptr<Map> globalMap;
+	Map* globalMap;
+	std::list<Creature*> characters;
 	std::shared_ptr<MainMap> globalMainMap;
 	Game() = default;
 	void init(); //create player
