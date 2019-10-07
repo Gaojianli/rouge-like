@@ -16,9 +16,9 @@ public:
 	BottleType type;
 	Bottle();
 	Bottle(BottleType, unsigned increased);
-	template <typename T>
-	bool use(T &target);
+	bool use(Creature* target);
 	ItemType getItemType() override;
 	std::string getInfo() override;
 	// void interactiveThis() override;
 };
+ 

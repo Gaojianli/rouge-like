@@ -1,5 +1,6 @@
 #include "bottle.h"
 #include "game.h"
+
 extern std::shared_ptr<Game> game;
 Bottle::Bottle()
 {
@@ -25,6 +26,47 @@ Bottle::Bottle()
 	}
 	default:
 		break;
+	}
+}
+
+bool Bottle::use(Creature* target)
+{
+	{
+		try
+		{
+			if (target->getType() == ObjectType::creature)
+			{
+				switch (this->type)
+				{
+				case BottleType::bloodBottle:
+					target->health += this->increased;
+					target->health = target->health > target->healthUpper ? target->healthUpper : target->health;
+					return true;
+				case BottleType::manaBottle:
+					if (target->getCreatureType() == CreatureType::monster)
+					{
+						return false;
+					}
+					else
+					{
+						auto mankind = dynamic_cast<Mankind*>(target);
+						mankind->mana += this->increased;
+						mankind->mana = mankind->mana > mankind->getManaUpper() ? mankind->getManaUpper() : mankind->mana;
+						return true;
+					}
+				case BottleType::poison:
+					target->bePoisoned += this->increased;
+					target->beAttacked = true;
+				default:
+					return false;
+				}
+			}
+		}
+		catch (std::exception& e)
+		{
+			game->addInfo(e.what());
+			return false;
+		}
 	}
 }
 Bottle::Bottle(BottleType type, unsigned increased)
@@ -61,44 +103,4 @@ std::string Bottle::getInfo()
 		break;
 	}
 	return describe;
-}
-template <typename T>
-bool Bottle::use(T &target)
-{
-	{
-		try
-		{
-			if constexpr (std::is_same_v<Creature, std::decay_t<T>>)
-			{
-				switch (this->type)
-				{
-				case BottleType::bloodBottle:
-					target.health += this->increased;
-					target.health = target.health > target.healthUpper ? target.healthUpper : target.health;
-					return true;
-				case BottleType::manaBottle:
-					if constexpr (std::is_same_v<Monster, std::decay_t<T>>)
-					{
-						return false;
-					}
-					else
-					{
-						target.mana += this->increased;
-						target.mana = target.mana > target.manaUpper ? target.manaUpper : target.mana;
-						return true;
-					}
-				case BottleType::poison:
-					target.bePoisoned += this->increased;
-					target.beAttacked = true;
-				default:
-					return false;
-				}
-			}
-		}
-		catch (std::exception &e)
-		{
-			game->addInfo(e.what());
-			return false;
-		}
-	}
 }

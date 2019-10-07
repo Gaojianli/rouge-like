@@ -116,8 +116,10 @@ bool Mankind::attack(Creature &beAttack)
 	int attackSum = this->getAttack();
 	//calculate defends sum
 	int defenseSum = beAttack.getDefense();
-	if (attackSum < defenseSum)
+	if (attackSum < defenseSum){
+		game->addInfo((name + " attacked " + beAttack.name + ", but nothing happened").c_str());
 		return false; //nothing happened
+	}
 	else
 		beAttack.health -= attackSum - defenseSum;
 	if (beAttack.health < 0)
@@ -126,6 +128,7 @@ bool Mankind::attack(Creature &beAttack)
 	{ //monster be controlled will attack same object
 		i->attack(beAttack);
 	}
+	game->addInfo((name + " attacked " + beAttack.name + ", and made " + std::to_string(attackSum - defenseSum) + " damage. " + beAttack.name + " health is " + std::to_string(beAttack.health)).c_str());
 	return true;
 }
 
@@ -134,11 +137,45 @@ bool Mankind::pick(Item *toPick)
 	if (backpack.size() <= 4) //backpack is full
 	{
 		this->backpack.push_back(toPick);
+		if (auto weaponItem = dynamic_cast<Weapons*>(toPick); weaponItem != nullptr) {
+			this->changeMana(weaponItem->mana);
+		}
 		return true;
 	}
 	else
 		return false;
 }
+
 CreatureType Mankind::getCreatureType() {
 	return CreatureType::human;
+}
+
+
+unsigned Mankind::getManaUpper()
+{
+	int manaUpperSum = manaUpper;
+	for (auto& i : backpack)
+	{
+		if (i->getItemType() == ItemType::weapons)
+		{
+			manaUpperSum += static_cast<Weapons*>(i)->mana;
+		}
+	}
+	return manaUpperSum;
+}
+
+void Mankind::changeMana(int amount)
+{
+	if (amount < 0) {
+		if (abs(amount) > mana)
+			mana = 0;
+		else
+			mana += amount;
+	}
+	else {
+		if (mana + amount > getManaUpper())
+			mana = getManaUpper();
+		else
+			mana += amount;
+	}
 }
