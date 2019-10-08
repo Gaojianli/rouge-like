@@ -12,12 +12,13 @@ ObjectType Creature::getType()
 
 void Creature::died()
 {
-	if (!isDied) {
+	if (!isDied)
+	{
 		isDied = true;
 		game->addInfo((this->name + " died.").c_str());
 	}
-	auto sameRoomObjectList = game->globalMap->getSameRoomObjectList();
-	if (std::find(sameRoomObjectList.begin(), sameRoomObjectList.end(), this) != sameRoomObjectList.end()) {
+	if (auto sameRoomObjectList = game->globalMap->getSameRoomObjectList(); std::find(sameRoomObjectList.begin(), sameRoomObjectList.end(), this) != sameRoomObjectList.end())
+	{
 		game->globalMap->eraseGameObjectAt(position.first, position.second, false);
 		game->characters.erase(std::find(game->characters.begin(), game->characters.end(), this));
 		delete this;
@@ -71,7 +72,8 @@ bool Creature::move(MoveDirection direction)
 	{
 		return false; //out of range
 	}
-	if (game->globalMap->getLocationType(newX, newY) != ObjectType::nothing) {
+	if (game->globalMap->getLocationType(newX, newY) != ObjectType::nothing)
+	{
 		return false; // on other things
 	}
 	else
