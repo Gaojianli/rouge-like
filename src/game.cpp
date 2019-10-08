@@ -154,7 +154,7 @@ void Game::start()
 		case 'M':
 		case 'm':
 			menuEnable[static_cast<int>(MenuType::Attack)] = isAround(ObjectType::creature) && (lastAttackRoundNumber != roundNumber);
-			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item);
+			menuEnable[static_cast<int>(MenuType::PickUp)] = isAround(ObjectType::item) && (player->backpack.size() < 4);
 			menuEnable[static_cast<int>(MenuType::Control)] = canControlAround() && (lastAttackRoundNumber != roundNumber);
 			menuEnable[static_cast<int>(MenuType::Investigate)] = (isAround(ObjectType::creature) || menuEnable[static_cast<int>(MenuType::PickUp)]);
 			menuEnable[static_cast<int>(MenuType::Backpack)] = !player->backpack.empty();
