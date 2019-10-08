@@ -115,6 +115,10 @@ inputName:
 
 void showItemInWin(WINDOW *win, Item *item)
 {
+	mvwaddstr(win, 0, 0, "       ");
+	mvwaddstr(win, 1, 0, "       ");
+	mvwaddstr(win, 2, 0, "       ");
+	mvwaddstr(win, 3, 0, "       ");
 	if (item == nullptr)
 	{
 		mvwaddstr(win, 0, 0, "       ");
