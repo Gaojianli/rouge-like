@@ -12,10 +12,16 @@ ObjectType Creature::getType()
 
 void Creature::died()
 {
-	game->globalMap->eraseGameObjectAt(position.first, position.second, false);
-	game->characters.remove(this);
-	game->addInfo((this->name + " died.").c_str());
-	delete this;
+	if (!isDied) {
+		isDied = true;
+		game->addInfo((this->name + " died.").c_str());
+	}
+	auto sameRoomObjectList = game->globalMap->getSameRoomObjectList();
+	if (std::find(sameRoomObjectList.begin(), sameRoomObjectList.end(), this) != sameRoomObjectList.end()) {
+		game->globalMap->eraseGameObjectAt(position.first, position.second, false);
+		game->characters.erase(std::find(game->characters.begin(), game->characters.end(), this));
+		delete this;
+	}
 }
 
 bool Creature::attack(Creature &beAttack)

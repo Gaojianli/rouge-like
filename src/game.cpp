@@ -242,6 +242,7 @@ void Game::start()
 						addInfo("You pass through the portal to the far right of the map.");
 					}
 				}
+				for (auto& charac : characters) if (charac->isDied) charac->died();
 			}
 			else if (abs(oldPosition.second - player->position.second) > 1) {
 				if (player->position.second == 0) {
@@ -270,6 +271,7 @@ void Game::start()
 						addInfo("You pass through the portal to the far up of the map.");
 					}
 				}
+				for (auto& charac : characters) if (charac->isDied) charac->died();
 			}
 		}
 	}
@@ -510,17 +512,19 @@ void Game::nextRound()
 		if (i->getItemType() == ItemType::key)
 			dynamic_cast<Key*>(i)->used = false;
 	}
-
 	for (auto& charac : characters)
 	{
-		if (charac->attitude == attitudes::agressive || charac->beAttacked == true)
-		{ //attack randomly
+		if (charac->isDied) {
+			charac->died();
+			continue;
 		}
 		if (charac->bePoisoned > 0)
 		{
 			charac->health -= charac->bePoisoned * 2; //health loss of ponison
-			if (charac->health <= 0)
+			if (charac->health <= 0) {
 				charac->died();
+				continue;
+			}
 			else
 				charac->bePoisoned--;
 		}

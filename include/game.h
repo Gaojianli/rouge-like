@@ -57,7 +57,7 @@ private:
 	bool attack();
 public:
 	Map* globalMap;
-	std::list<Creature*> characters;
+	std::vector<Creature*> characters;
 	std::shared_ptr<MainMap> globalMainMap;
 	Game() = default;
 	void init(); //create player
