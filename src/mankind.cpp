@@ -54,6 +54,7 @@ bool Mankind::conjure(Monster* object)
 		object->beControlled = 5; //control 5 rounds
 		object->master = this;
 		follower.push_back(object);
+		game->addInfo((name + " controlled " + object->name + "!").c_str());
 		return true;
 	}
 	else
