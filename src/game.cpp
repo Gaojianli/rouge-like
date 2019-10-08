@@ -507,9 +507,7 @@ void Game::nextRound()
 
 	//reset keys
 	for (auto i : player->backpack) {
-		if (i->getItemType() == ItemType::bottle)
-			continue;
-		else
+		if (i->getItemType() == ItemType::key)
 			dynamic_cast<Key*>(i)->used = false;
 	}
 
