@@ -29,6 +29,7 @@ public:
 	unsigned power = 10;
 	attitudes attitude;
 	bool beAttacked;
+	bool isDied = false;
 	int bePoisoned;
 	ObjectType getType() override;
 	virtual void died();

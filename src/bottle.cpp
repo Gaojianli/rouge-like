@@ -35,7 +35,6 @@ bool Bottle::use(Creature* target)
 {
 	try
 	{
-
 		switch (this->type)
 		{
 		case BottleType::bloodBottle:
