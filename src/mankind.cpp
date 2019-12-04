@@ -124,7 +124,7 @@ bool Mankind::attack(Creature& beAttack)
 	}
 	else
 		beAttack.health -= attackSum - defenseSum;
-	if (beAttack.health < 0) {
+	if (beAttack.health <= 0) {
 		game->addInfo((name + " attacked " + beAttack.name + ", and made " + std::to_string(attackSum - defenseSum) + " damage. ").c_str());
 		beAttack.died();
 	}
