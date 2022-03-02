@@ -6,25 +6,21 @@
 #include "weapons.h"
 #include "curses/curses.h"
 #include <cmath>
-#include <comutil.h>
+#include <locale>
+#include <codecvt>
 using std::string;
 #define COLOR_NORMAL COLOR_PAIR(1)
 #define COLOR_SELECTED COLOR_PAIR(2)
 #define COLOR_INVALID COLOR_PAIR(3)
 
+// convert wstring to string
 std::string ws2s(const std::wstring &ws)
 {
-	_bstr_t t = ws.c_str();
-	char *pchar = (char *)t;
-	string result = pchar;
-	return result;
+	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().to_bytes(ws);
 }
-std::wstring s2ws(const string &s)
+std::wstring s2ws(const std::string &s)
 {
-	_bstr_t t = s.c_str();
-	wchar_t *pwchar = (wchar_t *)t;
-	std::wstring result = pwchar;
-	return result;
+	return std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(s);
 }
 
 void Game::createPlayer()
@@ -37,16 +33,16 @@ void Game::createPlayer()
 	attrset(A_NORMAL);
 	mvprintw(LINES / 2 - 2, COLS / 2 - 27, "Please input your name:");
 	refresh();
-	curs_set(1); //show the curs
+	curs_set(1); // show the curs
 	echo();
 	auto name = new char[20];
-	flushinp(); //flush the input
+	flushinp(); // flush the input
 inputName:
 	getnstr(name, 20);
 	if (strlen(name) == 0)
 	{
 		move(LINES / 2 - 2, COLS / 2 - 4);
-		goto inputName; //reinput
+		goto inputName; // reinput
 	}
 	move(LINES / 2 - 2, 0);
 	clrtobot();
@@ -66,7 +62,7 @@ inputName:
 		{
 			string toInsert = "*";
 			toInsert += roles[i];
-			mvprintw(6 + i, COLS / 2 - 16, toInsert.c_str()); //default select
+			mvprintw(6 + i, COLS / 2 - 16, toInsert.c_str()); // default select
 		}
 		else
 			mvprintw(6 + i, COLS / 2 - 15, roles[i].c_str());
@@ -102,7 +98,7 @@ inputName:
 			mvprintw(6 + postion, COLS / 2 - 16, toInsert.c_str());
 			refresh();
 			break;
-		case 13: //enter
+		case 13: // enter
 			selected = true;
 			break;
 		default:
@@ -568,18 +564,18 @@ void Game::drawMain()
 {
 	resize_term(34, 100);
 	clrtobot();
-	//bkgd(COLOR_PAIR(1));
+	// bkgd(COLOR_PAIR(1));
 	menubar = subwin(stdscr, 1, 100, 0, 0);
-	//wbkgd(menubar, COLOR_PAIR(4));
+	// wbkgd(menubar, COLOR_PAIR(4));
 	map = subwin(stdscr, 11, 20, 2, 1);
-	//wbkgd(map, COLOR_PAIR(3));
+	// wbkgd(map, COLOR_PAIR(3));
 	status = subwin(stdscr, 11, 77, 2, 22);
-	//wbkgd(status, COLOR_PAIR(5));
+	// wbkgd(status, COLOR_PAIR(5));
 	info = subwin(stdscr, 19, 98, 14, 1);
 	wborder(map, '|', '|', '-', '-', '+', '+', '+', '+');
 	wborder(status, '|', '|', '-', '-', '+', '+', '+', '+');
 	wborder(info, '|', '|', '-', '-', '+', '+', '+', '+');
-	//wbkgd(info, COLOR_PAIR(5));
+	// wbkgd(info, COLOR_PAIR(5));
 	refresh();
 }
 
